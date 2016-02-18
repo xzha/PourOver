@@ -39,13 +39,12 @@
 #define BAUD_9600 ((FCY/9600)/16) - 1   // Designated baud rate for UART module
 #define BAUD_115200 ((FCY + 230400)/460800-1) 
 
-#define BUFFER_SIZE 1024
-
-#define SERVER_UUID "11223344556677889900aabbccddeeff"
-
 /* Macros */
 #define CYCLES_PER_MS ((unsigned long)(FCY * 0.001))        //instruction cycles per millisecond
 #define DELAY_MS(ms)  __delay32(CYCLES_PER_MS * ((unsigned long) ms));   //__delay32 is provided by the compiler, delay some # of milliseconds
+
+#define CYCLES_PER_US ((unsigned long)(FCY * 0.000001))        //instruction cycles per microsecond
+#define DELAY_US(us)  __delay32(CYCLES_PER_US * ((unsigned long) us));   //__delay32 is provided by the compiler, delay some # of milliseconds
 
 #endif	/* PourOver_definitions_h */
 

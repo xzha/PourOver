@@ -8,7 +8,7 @@
 /* Variables */
 volatile buffer tx_buffer;
 volatile buffer rx_buffer;
-volatile char receive_flag = 0;
+volatile char receive_flag;
 
 /* Initializations */
 void oscillator_initialization(void) {
@@ -101,6 +101,7 @@ int main()
     /* Initialize buffer */
     buffer_init(&tx_buffer);
     buffer_init(&rx_buffer);
+    receive_flag = 0;
     
     PORTCbits.RC1 = 1;                               // Wake up BT module
     DELAY_MS(200);                                   // Wait for BT to wake up

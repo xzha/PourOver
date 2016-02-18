@@ -33,14 +33,8 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "definitions.h"
 
-/* Structures */
-typedef struct {
-    int head;
-    int tail;
-    char b[BUFFER_SIZE];
-} buffer;
-
 /* Constants */
+#define SERVER_UUID "11223344556677889900aabbccddeeff"
 #define START_BREW "75dc2f8004f242f48ab048d642153c91";
 #define BREW_STATE "d2025d7957084ff1bc76c01e1abebb4d";
 #define BREW_TEMP "7975652bf2a24f73a2da429ac3a83dfb";
@@ -49,6 +43,15 @@ typedef struct {
 #define BEAN_LEVEL "67b0653508394365bf7f8afc631e54a1";
 #define BREW_STRENGTH "dbfde0ac2cf241269759042cd13e5681";
 #define BREW_SCHEDULE "6ced5f74565c4608ba3d043f4b0297f9";
+
+#define BUFFER_SIZE 1024
+
+/* Structures */
+typedef struct {
+    int head;
+    int tail;
+    char b[BUFFER_SIZE];
+} buffer;
 
 /* Variables*/
 extern volatile buffer tx_buffer;
