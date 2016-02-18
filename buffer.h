@@ -40,7 +40,19 @@ typedef struct {
     char b[BUFFER_SIZE];
 } buffer;
 
+/* Constants */
+#define START_BREW "75dc2f8004f242f48ab048d642153c91";
+#define BREW_STATE "d2025d7957084ff1bc76c01e1abebb4d";
+#define BREW_TEMP "7975652bf2a24f73a2da429ac3a83dfb";
+#define BREW_SIZE "1cf1a1b203bb4f7ca28a8881169bede5";
+#define WATER_LEVEL "538c13e23739428086ac91ab935a6ce1";
+#define BEAN_LEVEL "67b0653508394365bf7f8afc631e54a1";
+#define BREW_STRENGTH "dbfde0ac2cf241269759042cd13e5681";
+#define BREW_SCHEDULE "6ced5f74565c4608ba3d043f4b0297f9";
+
 /* Variables*/
+extern volatile buffer tx_buffer;
+extern volatile buffer rx_buffer;
 extern volatile char receive_flag;
 
 /* Functions*/
@@ -50,20 +62,20 @@ char string_len(char *);
 void buffer_init(volatile buffer *);
 void buffer_empty(volatile buffer *);
 
-void buffer_add_char(volatile buffer *, char);
-void buffer_add(volatile buffer *, char *);
+void buffer_add_char(volatile buffer *,char);
+void buffer_add(char *);
 
 char buffer_write_segment(volatile buffer *);
-void buffer_transmit(volatile buffer *, char *);
+void buffer_transmit(char *);
 
 char buffer_read_segment(volatile buffer *, char *);
-char buffer_check(volatile buffer *, char *);
+char buffer_check(char *);
 
-char buffer_transmit_check(volatile buffer *, volatile buffer *, char *, char *);
-void buffer_transmit_set(volatile buffer *, volatile buffer *, char *, char *);
+char buffer_transmit_check(char *, char *);
+void buffer_transmit_set(char *, char *);
 
-void buffer_suw(volatile buffer *, volatile buffer *, char *, char *);
-void buffer_sur(volatile buffer *, volatile buffer *, char *, char *);
+void buffer_suw(char *, char *);
+void buffer_sur(char *, char *);
 
 #endif	/* PourOver_buffer_h */
 

@@ -38,10 +38,10 @@ void buffer_add_char(volatile buffer * buff, char c) {
     buff->tail = (buff->tail + 1) % BUFFER_SIZE;
 }
 
-void buffer_add(volatile buffer * buff, char * s) {
+void buffer_add(char * s) {
     int i = 0;
     while (s[i] != '\0') {
-        buffer_add_char(buff, s[i]);
+        buffer_add_char(&tx_buffer, s[i]);
         i++;
     }
 }
@@ -60,11 +60,11 @@ char buffer_write_segment(volatile buffer * buff) {
     return 0;
 }
 
-void buffer_transmit(volatile buffer * buff, char * s) {
-    buffer_add(buff, s);
-    buffer_add_char(buff, '\r');
-    buffer_add_char(buff, '\n');
-    while(buffer_write_segment(buff));
+void buffer_transmit(char * s) {
+    buffer_add(s);
+    buffer_add_char(&tx_buffer, '\r');
+    buffer_add_char(&tx_buffer, '\n');
+    while(buffer_write_segment(&tx_buffer));
 }
 
 char buffer_read_segment(volatile buffer * buff, char * s) {
@@ -85,11 +85,11 @@ char buffer_read_segment(volatile buffer * buff, char * s) {
     return 0;
 }
 
-char buffer_check(volatile buffer * buff, char * s) {
+char buffer_check(char * s) {
     int i = 0;
     char temp[20];
     
-    if (!buffer_read_segment(buff, temp))
+    if (!buffer_read_segment(&rx_buffer, temp))
         return 0;
     
     while(s[i] != '\0') {
@@ -104,16 +104,16 @@ char buffer_check(volatile buffer * buff, char * s) {
     return 1;
 }
  
-char buffer_transmit_check(volatile buffer * tx, volatile buffer * rx, char * s, char * r) {
-    buffer_transmit(tx, s);
+char buffer_transmit_check(char * s, char * r) {
+    buffer_transmit(s);
     DELAY_MS(300);
     
-    if (!buffer_check(rx, r))
+    if (!buffer_check(r))
         return 0;
     return 1;
 }
 
-void buffer_transmit_set(volatile buffer * tx, volatile buffer * rx, char * s, char * r) {
+void buffer_transmit_set(char * s, char * r) {
     char get[30];
     char set[30];
     int len = string_len(s);
@@ -121,15 +121,15 @@ void buffer_transmit_set(volatile buffer * tx, volatile buffer * rx, char * s, c
     string_copy(s, get);
     get[0] = 'g';
     
-    if(!buffer_transmit_check(tx, rx, get, r)) {
+    if(!buffer_transmit_check(get, r)) {
         string_copy(s, set);
         set[len] = ',';
         string_copy(r, &set[len+1]);
-        while (!buffer_transmit_check(tx, rx, set, "AOK"));
+        while (!buffer_transmit_check(set, "AOK"));
     }
 }
 
-void buffer_suw(volatile buffer * tx, volatile buffer * rx, char * u, char * d) {
+void buffer_suw(char * u, char * d) {
     char suw[50];
     
     string_copy("suw,", suw);
@@ -137,16 +137,16 @@ void buffer_suw(volatile buffer * tx, volatile buffer * rx, char * u, char * d) 
     string_copy(",", &suw[string_len(suw) + 1]);
     string_copy(d,   &suw[string_len(suw) + 1]);
     
-    while (!buffer_transmit_check(tx, rx, suw, "AOK"));
+    while (!buffer_transmit_check(suw, "AOK"));
 }
 
-void buffer_sur(volatile buffer * tx, volatile buffer * rx, char * u, char * d) {
+void buffer_sur(char * u, char * d) {
     char sur[20];
     
     string_copy("sur,", sur);
     string_copy(u, &sur[string_len(sur) + 1]);
     
-    buffer_transmit(tx, sur);
+    buffer_transmit(sur);
     
-    buffer_read_segment(rx, d);
+    buffer_read_segment(&rx_buffer, d);
 }
