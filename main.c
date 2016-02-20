@@ -17,10 +17,10 @@ int main()
     oscillator_initialization();        // Clock:  8Mhz
     port_initialization();
     uart_initialization();              // UART1:  9600 Baud
-    oc_initialization();                // OC1:    500Hz, 50% duty cycle
-                                        // OC2:    500Hz, 50% duty cycle
-                                        // OC3:    500Hz, 50% duty cycle
-                                        // OC4:    500Hz, 50% duty cycle
+    oc_initialization();                // OC1:    500Hz, 50% duty cycle (timer2)
+                                        // OC2:    500Hz, 50% duty cycle (timer2)
+                                        // OC3:    500Hz, 50% duty cycle (timer2)
+                                        // OC4:    500Hz, 50% duty cycle (timer3)
     timer_initialization();             // timer1: 1Hz
                                         // timer2: 500Hz
                                         // timer3: 500Hz
@@ -35,17 +35,15 @@ int main()
             oc_frequency(1000,1);
             oc_dutycycle(15,1);
             
-            //oc_frequency(1000,2);
             oc_dutycycle(25,2);
             
-            //oc_frequency(2000,3);
             oc_dutycycle(65,3);
             
-            //oc_frequency(2500,4);
+            oc_frequency(2500,4);
             oc_dutycycle(85,4);
         }
         
-        // BLE write on timer
+       
     }
 
     return 0;

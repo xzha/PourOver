@@ -54,11 +54,15 @@ void timer_initialization(void) {
 }
 
 void port_initialization(void) {
-    /* Port C */
+    /* Port F */
     TRISFbits.TRISF4 = 0;               // RF4 as output (BT module wake pin)
     TRISFbits.TRISF5 = 1;               // RF5 as input (BT module connection pin)
     
     PORTFbits.RF4 = 1;                  // Wake up BT module
+    
+    /* Port G */
+    TRISGbits.TRISG15 = 0;              // RG15 as output
+    PORTGbits.RG15 = 1;
 }
 
 void uart_initialization(void) {
