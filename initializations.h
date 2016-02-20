@@ -20,24 +20,25 @@
  */
 
 /* 
- * File: outputcompare.h   
+ * File: initializations.h   
  * Author: Xiongyao Zha
- * Comments: Control PWN signals to water pump and servos
+ * Comments: All initializations are listed here.
  */
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef PourOver_outputcompare_h
-#define	PourOver_outputcompare_h
+#ifndef PourOver_initializations_h
+#define	PourOver_initializations_h
 
 #include <xc.h> // include processor files - each processor file is guarded.
 #include "definitions.h"
 
 /* Functions */
-int power(int, int);
+void oscillator_initialization(void);
+void port_initialization(void);
+void uart_initialization(void);
+void oc_initialization(void);
+void timer_initialization(void);
 
-void oc_frequency(long int, char);
-void oc_dutycycle(float, char);
-
-#endif	/* PourOver_outputcompare_h */
+#endif	/* PourOver_initializations_h */
 

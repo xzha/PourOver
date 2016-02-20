@@ -32,6 +32,7 @@
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "definitions.h"
+#include "initializations.h"
 
 /* Constants */
 #define SERVER_UUID "11223344556677889900aabbccddeeff"
@@ -79,6 +80,8 @@ void buffer_transmit_set(char *, char *);
 
 void buffer_suw(char *, char *);
 void buffer_sur(char *, char *);
+
+void bluetooth_initialization();
 
 #endif	/* PourOver_buffer_h */
 
