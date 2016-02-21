@@ -61,8 +61,8 @@ void port_initialization(void) {
     PORTFbits.RF4 = 1;                  // Wake up BT module
     
     /* Port G */
-    TRISGbits.TRISG15 = 0;              // RG15 as output
-    PORTGbits.RG15 = 1;
+    //TRISGbits.TRISG15 = 0;              // RG15 as output
+    //PORTGbits.RG15 = 1;
 }
 
 void uart_initialization(void) {

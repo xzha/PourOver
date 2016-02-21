@@ -5,11 +5,14 @@
 #include "initializations.h"
 #include "outputcompare.h"
 #include "buffer.h"
+#include "temperature.h"
 
 /* Variables */
 volatile buffer tx_buffer;
 volatile buffer rx_buffer;
 volatile char receive_flag = 0;
+
+TEMPRETURN temperatureValue;
 
 int main()
 {
@@ -42,11 +45,17 @@ int main()
             oc_frequency(2500,4);
             oc_dutycycle(85,4);
         }
-        
        
+        temperatureValue = readTemperature();
+        
+        if(temperatureValue == ERROR_TEMP)
+        {
+            // Error calculating the temperature
+            return(-1);
+        }
     }
 
-    return 0;
+    return(0);
 }
 
 /* Interrupts */ 
