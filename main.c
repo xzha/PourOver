@@ -34,7 +34,6 @@ int main()
         // BLE REQUEST
         if (PORTFbits.RF5) {
             // receive_flag = 0; 
-            
             oc_frequency(1000,1);
             oc_dutycycle(15,1);
             
@@ -46,12 +45,11 @@ int main()
             oc_dutycycle(85,4);
         }
        
+        // Grab the temperature from the temperature probe and check for any errors
         temperatureValue = readTemperature();
         
-        if(temperatureValue == ERROR_TEMP)
-        {
-            // Error calculating the temperature
-            return(-1);
+        // discard value, do not send to BT
+        if (temperatureValue == ERROR_TEMP) {
         }
     }
 

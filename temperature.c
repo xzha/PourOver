@@ -1,13 +1,6 @@
-/*
- * File:   temperature.c
- * Author: EE63pc6-user
- *
- * Created on February 20, 2016, 2:47 PM
- */
-
 #include "temperature.h"
-#include "definitions.h"
 
+/* Resets the devices on the One-Wire Bus */
 char Reset_18B20()
 {
     Tx_18B20;                                               // Set pin to output
@@ -27,6 +20,8 @@ char Reset_18B20()
         return(1);                                          // One-Wire is not present
     }
 }
+
+/* Writes 8 bits to the One-Wire Bus */
 void Write_18B20(char command)
 {
     char i;
@@ -54,6 +49,7 @@ void Write_18B20(char command)
     }
 }
 
+/* Reads 8 bits from the slave on the One-Wire Bus */
 char Read_18B20()
 {
     char i;
@@ -80,7 +76,7 @@ char Read_18B20()
     return(result);
 }
 
-
+/* Reads the temperature from the temperature probe */
 TEMPRETURN readTemperature()
 {
     int tempLow, tempHigh;
