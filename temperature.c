@@ -77,15 +77,13 @@ char Read_18B20()
 }
 
 /* Reads the temperature from the temperature probe */
-TEMPRETURN readTemperature()
+int read_temperature()
 {
     int tempLow, tempHigh;
     int temperature;
     
-#ifdef TEMPFLOAT
     float finalTemperature;
     float fractionTemperature;
-#endif
 
     if(!Reset_18B20())
     {
@@ -104,23 +102,14 @@ TEMPRETURN readTemperature()
         temperature = (tempHigh << 8) | tempLow;            // Combine the two bytes that were read in
         temperature = temperature >> 4;                     // Divide by 16 to truncate the decimals
         
-#ifdef TEMPFLOAT
-                                                            // Perform floating point operations
+                                                            // Perform floating point operations (and convert to Farenheit)
         fractionTemperature = (float) (tempLow & 0x000F) / 16.0;
-        finalTemperature = (float) temperature + fractionTemperature;
-#else
-        temperature = temperature + !!(tempLow & 0x0008);   // If the fraction is >= 0.5, round up
-#endif 
+        finalTemperature = ((float) temperature + fractionTemperature) * 1.8 + 32.0;
     }
     else
-    {
-                                                            // Error, device not found
-        return(ERROR_TEMP);
+    {                                           
+        return(ERROR_TEMP);                                 // Error, device not found
     }
     
-#ifdef TEMPFLOAT
-    return(finalTemperature);                                      // Return a float
-#else
-    return(temperature);                                    // Return an int
-#endif
+    return((int) finalTemperature);                         // Return an int
 }

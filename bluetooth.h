@@ -20,37 +20,47 @@
  */
 
 /* 
- * File: temperature.h   
- * Author: Eric Murphy
- * Comments: Interface with temperature sensor. Basic implementation obtained 
- *           from "www.pic_examples.byethost3.com/DS18B20.html".
+ * File: bluetooth.h   
+ * Author: Xiongyao Zha
+ * Comments: RN4020 Interface
  */
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef PourOver_temperature_h
-#define	PourOver_temperature_h
+#ifndef PourOver_bluetooth_h
+#define	PourOver_bluetooth_h
 
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "definitions.h"
+#include "buffer.h"
+#include "initializations.h"
 
-/* One-Wire I/O Macros */
-#define Port_18B20 PORTDbits.RD13
-#define Tx_18B20 TRISDbits.TRISD13 = 0
-#define Rx_18B20 TRISDbits.TRISD13 = 1
+/* Variables*/
+extern char SERVER_UUID[];
 
-/* Constants */
-#define SKIP_ROM 0xCC
-#define CONVERT_T 0x44
-#define READ_SCRATCHPAD 0xBE
-#define ALARM_SEARCH 0xEC
-#define RECALL_EE 0xB8
-#define ERROR_TEMP 0x7FFF
+extern char START_BREW_U[];
+extern char BREW_STATE_U[];
+extern char BREW_TEMP_U[];
+extern char BREW_SIZE_U[];
+extern char WATER_LEVEL_U[];
+extern char BEAN_LEVEL_U[];
+extern char BREW_STRENGTH_U[];
+extern char BREW_SCHEDULE_U[];
 
-/* Functions */
-char Reset_18B20();
-void Write_18B20(char);
-char Read_18B20();
-int read_temperature();
+extern char START_BREW_H[];
+extern char BREW_STATE_H[];
+extern char BREW_TEMP_H[];
+extern char BREW_SIZE_H[];
+extern char WATER_LEVEL_H[];
+extern char BEAN_LEVEL_H[];
+extern char BREW_STRENGTH_H[];
+extern char BREW_SCHEDULE_H[];
 
-#endif	/* PourOver_temperature_h */
+/* Functions*/
+void bluetooth_initialization();
+void bluetooth_ls();
+void bluetooth_shw(char *, char *);
+void bluetooth_shr(char *, char *);
+
+#endif	/* PourOver_bluetooth_h */
+

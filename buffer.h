@@ -35,17 +35,7 @@
 #include "initializations.h"
 
 /* Constants */
-#define SERVER_UUID "11223344556677889900aabbccddeeff"
-#define START_BREW "75dc2f8004f242f48ab048d642153c91";
-#define BREW_STATE "d2025d7957084ff1bc76c01e1abebb4d";
-#define BREW_TEMP "7975652bf2a24f73a2da429ac3a83dfb";
-#define BREW_SIZE "1cf1a1b203bb4f7ca28a8881169bede5";
-#define WATER_LEVEL "538c13e23739428086ac91ab935a6ce1";
-#define BEAN_LEVEL "67b0653508394365bf7f8afc631e54a1";
-#define BREW_STRENGTH "dbfde0ac2cf241269759042cd13e5681";
-#define BREW_SCHEDULE "6ced5f74565c4608ba3d043f4b0297f9";
-
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 512
 
 /* Structures */
 typedef struct {
@@ -60,8 +50,12 @@ extern volatile buffer rx_buffer;
 extern volatile char receive_flag;
 
 /* Functions*/
+unsigned char string_len(char *);
 void string_copy(char *, char *);
-char string_len(char *);
+char string_compare(char *, char *);
+
+void int_to_ascii(int, char *);
+void int_to_hexstring(int, char *);
 
 void buffer_init(volatile buffer *);
 void buffer_empty(volatile buffer *);
@@ -77,11 +71,6 @@ char buffer_check(char *);
 
 char buffer_transmit_check(char *, char *);
 void buffer_transmit_set(char *, char *);
-
-void buffer_suw(char *, char *);
-void buffer_sur(char *, char *);
-
-void bluetooth_initialization();
 
 #endif	/* PourOver_buffer_h */
 

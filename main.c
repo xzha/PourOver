@@ -1,18 +1,4 @@
-// PIC24FJ128GA010's header
-#include <xc.h>
-#include "configurationbits.h"
-#include "definitions.h"
-#include "initializations.h"
-#include "outputcompare.h"
-#include "buffer.h"
-#include "temperature.h"
-
-/* Variables */
-volatile buffer tx_buffer;
-volatile buffer rx_buffer;
-volatile char receive_flag = 0;
-
-TEMPRETURN temperatureValue;
+#include "pourover.h"
 
 int main()
 {
@@ -28,12 +14,11 @@ int main()
                                         // timer2: 500Hz
                                         // timer3: 500Hz
     bluetooth_initialization();
-    
+
     while(1)
     {
-        // BLE REQUEST
+        // BLE connected
         if (PORTFbits.RF5) {
-            // receive_flag = 0; 
             oc_frequency(1000,1);
             oc_dutycycle(15,1);
             
@@ -43,13 +28,33 @@ int main()
             
             oc_frequency(2500,4);
             oc_dutycycle(85,4);
-        }
-       
-        // Grab the temperature from the temperature probe and check for any errors
-        temperatureValue = readTemperature();
-        
-        // discard value, do not send to BT
-        if (temperatureValue == ERROR_TEMP) {
+               
+//            char temp[5];
+//            int_to_hexstring(read_temperature(), temp);
+//            bluetooth_shw(BREW_TEMP_H, temp);
+//            
+//            int_to_hexstring(2, temp);
+//            bluetooth_shw(BREW_STATE_H, temp);
+//            
+//            int_to_hexstring(4, temp);
+//            bluetooth_shw(BREW_SIZE_H, temp);
+//            
+//            int_to_hexstring(1, temp);
+//            bluetooth_shw(WATER_LEVEL_H, temp);
+//            
+//            int_to_hexstring(1, temp);
+//            bluetooth_shw(BEAN_LEVEL_H, temp);
+//            
+//            int_to_hexstring(1, temp);
+//            bluetooth_shw(BREW_STRENGTH_H, temp);
+//            
+            if (receive_flag) {
+                if (buffer_check("Connected") == 1)
+                    continue;
+                if (buffer_check("Connection End") == 1)
+                    continue;
+                // WV,000B,123456789DEF.
+            }
         }
     }
 

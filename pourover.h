@@ -20,37 +20,49 @@
  */
 
 /* 
- * File: temperature.h   
- * Author: Eric Murphy
- * Comments: Interface with temperature sensor. Basic implementation obtained 
- *           from "www.pic_examples.byethost3.com/DS18B20.html".
+ * File: pourover.h   
+ * Author: Xiongyao Zha
+ * Comments: PourOver firmware.
  */
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef PourOver_temperature_h
-#define	PourOver_temperature_h
+#ifndef PourOver_h
+#define	PourOver_h
 
-#include <xc.h> // include processor files - each processor file is guarded.  
+#include <xc.h>
+#include "configurationbits.h"
 #include "definitions.h"
+#include "initializations.h"
+#include "outputcompare.h"
+#include "bluetooth.h"
+#include "temperature.h"
+/* Variables */
+volatile buffer tx_buffer;
+volatile buffer rx_buffer;
+volatile char receive_flag = 0;
 
-/* One-Wire I/O Macros */
-#define Port_18B20 PORTDbits.RD13
-#define Tx_18B20 TRISDbits.TRISD13 = 0
-#define Rx_18B20 TRISDbits.TRISD13 = 1
+/* Service */
+char SERVER_UUID[]     = "11223344556677889900AABBCCDDEEFF";
 
-/* Constants */
-#define SKIP_ROM 0xCC
-#define CONVERT_T 0x44
-#define READ_SCRATCHPAD 0xBE
-#define ALARM_SEARCH 0xEC
-#define RECALL_EE 0xB8
-#define ERROR_TEMP 0x7FFF
+/* Characteristics */
+char START_BREW_U[]    = "75DC2F8004F242F48AB048D642153C91";
+char BREW_STATE_U[]    = "D2025D7957084FF1BC76C01E1ABEBB4D";
+char BREW_TEMP_U[]     = "7975652BF2A24F73A2DA429AC3A83DFB";
+char BREW_SIZE_U[]     = "1CF1A1B203BB4F7CA28A8881169BEDE5";
+char WATER_LEVEL_U[]   = "538C13E23739428086AC91AB935A6CE1";
+char BEAN_LEVEL_U[]    = "67B0653508394365BF7F8AFC631E54A1";
+char BREW_STRENGTH_U[] = "DBFDE0AC2CF241269759042CD13E5681";
+char BREW_SCHEDULE_U[] = "6CED5F74565C4608BA3D043F4B0297F9";
 
-/* Functions */
-char Reset_18B20();
-void Write_18B20(char);
-char Read_18B20();
-int read_temperature();
+char START_BREW_H[]    = "FFFF";
+char BREW_STATE_H[]    = "FFFF";
+char BREW_TEMP_H[]     = "FFFF";
+char BREW_SIZE_H[]     = "FFFF";
+char WATER_LEVEL_H[]   = "FFFF";
+char BEAN_LEVEL_H[]    = "FFFF";
+char BREW_STRENGTH_H[] = "FFFF";
+char BREW_SCHEDULE_H[] = "FFFF";
 
-#endif	/* PourOver_temperature_h */
+#endif	/* PourOver_h */
+
