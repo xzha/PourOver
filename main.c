@@ -17,45 +17,43 @@ int main()
 
     while(1)
     {
+        char bt_var_handle = -1;
+
         // BLE connected
         if (PORTFbits.RF5) {
-            oc_frequency(1000,1);
-            oc_dutycycle(15,1);
-            
-            oc_dutycycle(25,2);
-            
-            oc_dutycycle(65,3);
-            
-            oc_frequency(2500,4);
-            oc_dutycycle(85,4);
-               
-//            char temp[5];
-//            int_to_hexstring(read_temperature(), temp);
-//            bluetooth_shw(BREW_TEMP_H, temp);
-//            
-//            int_to_hexstring(2, temp);
-//            bluetooth_shw(BREW_STATE_H, temp);
-//            
-//            int_to_hexstring(4, temp);
-//            bluetooth_shw(BREW_SIZE_H, temp);
-//            
-//            int_to_hexstring(1, temp);
-//            bluetooth_shw(WATER_LEVEL_H, temp);
-//            
-//            int_to_hexstring(1, temp);
-//            bluetooth_shw(BEAN_LEVEL_H, temp);
-//            
-//            int_to_hexstring(1, temp);
-//            bluetooth_shw(BREW_STRENGTH_H, temp);
-//            
-            if (receive_flag) {
-                if (buffer_check("Connected") == 1)
+            if (receive_flag > 0) {
+                if (buffer_check(&rx_buffer,"Connected") == 1)
                     continue;
-                if (buffer_check("Connection End") == 1)
+                if (buffer_check(&rx_buffer, "Connection End") == 1)
                     continue;
-                // WV,000B,123456789DEF.
+                
+                // BLE received data
+                bt_var_handle = bluetooth_wv();
             }
         }
+        
+        // process received data (state machine?)
+        switch (bt_var_handle) {
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            case 8:
+                break;
+            default:
+                break;
+        }
+        
     }
 
     return(0);
@@ -108,6 +106,6 @@ void __attribute__((__interrupt__, auto_psv)) _U1RXInterrupt(void)
         char r = U1RXREG;
         buffer_add_char(&rx_buffer, r);
         if (r == '\n')
-            receive_flag = 1;
+            receive_flag++;
     }
 }

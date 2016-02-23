@@ -64,5 +64,14 @@ char BEAN_LEVEL_H[]    = "FFFF";
 char BREW_STRENGTH_H[] = "FFFF";
 char BREW_SCHEDULE_H[] = "FFFF";
 
+int START_BREW_V    = 0;
+int BREW_STATE_V    = 0;
+int BREW_TEMP_V     = 0;
+int BREW_SIZE_V     = 0;
+int WATER_LEVEL_V   = 0;
+int BEAN_LEVEL_V    = 0;
+int BREW_STRENGTH_V = 0;
+int BREW_SCHEDULE_V = 0;
+
 #endif	/* PourOver_h */
 

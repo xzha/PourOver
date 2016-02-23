@@ -5,10 +5,6 @@ void bluetooth_initialization() {
     buffer_init(&tx_buffer);
     buffer_init(&rx_buffer);
     receive_flag = 0;
-    
-    //PORTFbits.RF4 = 1;                               // Wake up BT module
-    //DELAY_MS(200);                                   // Wait for BT to wake up
-    //while(!buffer_check("CMD"));
 
     /* Initialize bluetooth module */
     buffer_transmit_set("sn", "PourOver");
@@ -102,13 +98,79 @@ void bluetooth_shw(char * h, char * d) {
     while (!buffer_transmit_check(shw, "AOK"));
 }
 
-void bluetooth_shr(char * u, char * d) {
+void bluetooth_shr(char * h, char * d) {
     char shr[10];
     
     string_copy("shr,", shr);
-    string_copy(u, &shr[string_len(shr) + 1]);
+    string_copy(h, &shr[string_len(shr) + 1]);
     
     buffer_transmit(shr);
     
     buffer_read_segment(&rx_buffer, d);
+}
+
+char bluetooth_wv() {
+    // WV,000B,123456789DEF.
+    char temp[50];
+    
+    char d[35];
+    char h[5];
+    
+    buffer_read_segment(&rx_buffer, temp);
+    
+    if (temp[0] != 'W' && temp[1] != 'V')
+        return -1;
+    
+    int i = 3;
+        
+    // read in handle
+    while (temp[i] != ',') {
+        h[i-3] = temp[i];
+        i++;
+    }
+    h[i-3] = '\0';
+        
+    int offset = ++i;
+        
+    // read in data
+    while (temp[i] != '.') {
+        d[i - offset] = temp[i];
+        i++;
+    }
+    d[i - offset] = '\0';
+    
+    if (string_compare(h, START_BREW_H)) {
+        START_BREW_V = hexstring_to_int(d);
+        return 1;
+    }
+    else if (string_compare(h, BREW_STATE_H)) {
+        BREW_STATE_V = hexstring_to_int(d);
+        return 2;
+    }
+    else if (string_compare(h, BREW_TEMP_H)) {
+        BREW_TEMP_V = hexstring_to_int(d);
+        return 3;
+    }
+    else if (string_compare(h, BREW_SIZE_H)) {
+        BREW_SIZE_V = hexstring_to_int(d);
+        return 4;
+    }
+    else if (string_compare(h, WATER_LEVEL_H)) {
+        WATER_LEVEL_V = hexstring_to_int(d);
+        return 5;
+    }
+    else if (string_compare(h, BEAN_LEVEL_H)) {
+        BEAN_LEVEL_V = hexstring_to_int(d);
+        return 6;
+    }
+    else if (string_compare(h, BREW_STRENGTH_H)) {
+        BREW_STRENGTH_V = hexstring_to_int(d);
+        return 7;
+    }
+    else if (string_compare(h, BREW_SCHEDULE_H)) {
+        BREW_SCHEDULE_V = hexstring_to_int(d);
+        return 8;
+    }
+    
+    return -1;
 }

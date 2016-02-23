@@ -56,11 +56,21 @@ extern char BEAN_LEVEL_H[];
 extern char BREW_STRENGTH_H[];
 extern char BREW_SCHEDULE_H[];
 
+extern int START_BREW_V;
+extern int BREW_STATE_V;
+extern int BREW_TEMP_V;
+extern int BREW_SIZE_V;
+extern int WATER_LEVEL_V;
+extern int BEAN_LEVEL_V;
+extern int BREW_STRENGTH_V;
+extern int BREW_SCHEDULE_V;
+
 /* Functions*/
 void bluetooth_initialization();
 void bluetooth_ls();
 void bluetooth_shw(char *, char *);
 void bluetooth_shr(char *, char *);
+char bluetooth_wv();
 
 #endif	/* PourOver_bluetooth_h */
 

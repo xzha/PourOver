@@ -54,8 +54,8 @@ unsigned char string_len(char *);
 void string_copy(char *, char *);
 char string_compare(char *, char *);
 
-void int_to_ascii(int, char *);
 void int_to_hexstring(int, char *);
+int hexstring_to_int(char *);
 
 void buffer_init(volatile buffer *);
 void buffer_empty(volatile buffer *);
@@ -67,7 +67,9 @@ char buffer_write_segment(volatile buffer *);
 void buffer_transmit(char *);
 
 char buffer_read_segment(volatile buffer *, char *);
-char buffer_check(char *);
+char buffer_read_check(char *);
+char buffer_check(volatile buffer *, char *);
+
 
 char buffer_transmit_check(char *, char *);
 void buffer_transmit_set(char *, char *);
