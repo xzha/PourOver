@@ -33,37 +33,32 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 #include "definitions.h"
 #include "buffer.h"
-#include "initializations.h"
 
 /* Variables*/
-extern char SERVER_UUID[];
+#define CHARACTERISTIC_COUNT 8
 
-extern char START_BREW_U[];
-extern char BREW_STATE_U[];
-extern char BREW_TEMP_U[];
-extern char BREW_SIZE_U[];
-extern char WATER_LEVEL_U[];
-extern char BEAN_LEVEL_U[];
-extern char BREW_STRENGTH_U[];
-extern char BREW_SCHEDULE_U[];
+/* Structures */
+typedef struct {
+    char uuid[35];
+    char handle[5];
+    int value;
+} characteristic;
 
-extern char START_BREW_H[];
-extern char BREW_STATE_H[];
-extern char BREW_TEMP_H[];
-extern char BREW_SIZE_H[];
-extern char WATER_LEVEL_H[];
-extern char BEAN_LEVEL_H[];
-extern char BREW_STRENGTH_H[];
-extern char BREW_SCHEDULE_H[];
+typedef struct {
+    char uuid[35];
+    characteristic * c[CHARACTERISTIC_COUNT];
+} service;
 
-extern int START_BREW_V;
-extern int BREW_STATE_V;
-extern int BREW_TEMP_V;
-extern int BREW_SIZE_V;
-extern int WATER_LEVEL_V;
-extern int BEAN_LEVEL_V;
-extern int BREW_STRENGTH_V;
-extern int BREW_SCHEDULE_V;
+/* Variables*/
+extern service server;
+extern characteristic start_brew;
+extern characteristic brew_state;
+extern characteristic brew_temp;
+extern characteristic brew_size;
+extern characteristic water_level;
+extern characteristic bean_level;
+extern characteristic brew_strength;
+extern characteristic brew_schedule;
 
 /* Functions*/
 void bluetooth_initialization();

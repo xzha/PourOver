@@ -1,5 +1,7 @@
 #include "pourover.h"
 
+long tempValue0;
+
 int main()
 {
     /* Initialize to default values */
@@ -14,7 +16,22 @@ int main()
                                         // timer2: 500Hz
                                         // timer3: 500Hz
     bluetooth_initialization();
-
+    
+    while(0)
+    {
+        powerUp();
+        
+        tare(5);
+        
+        tempValue0 = readData();
+        
+        tempValue0++;
+        
+        tempValue0 = readData();
+        
+        tempValue0++;
+    }
+    
     while(1)
     {
         char bt_var_handle = -1;
@@ -32,8 +49,12 @@ int main()
             }
         }
         
+        char temp[20];
+        
         // process received data (state machine?)
         switch (bt_var_handle) {
+            case 0:
+                break;
             case 1:
                 break;
             case 2:
@@ -45,10 +66,10 @@ int main()
             case 5:
                 break;
             case 6:
+                int_to_hexstring(read_temperature(), temp);
+                bluetooth_shw(brew_temp.handle, temp);
                 break;
             case 7:
-                break;
-            case 8:
                 break;
             default:
                 break;

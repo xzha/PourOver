@@ -37,41 +37,25 @@
 #include "outputcompare.h"
 #include "bluetooth.h"
 #include "temperature.h"
+#include "loadsensor.h"
+
 /* Variables */
 volatile buffer tx_buffer;
 volatile buffer rx_buffer;
 volatile char receive_flag = 0;
 
 /* Service */
-char SERVER_UUID[]     = "11223344556677889900AABBCCDDEEFF";
+service server;
 
 /* Characteristics */
-char START_BREW_U[]    = "75DC2F8004F242F48AB048D642153C91";
-char BREW_STATE_U[]    = "D2025D7957084FF1BC76C01E1ABEBB4D";
-char BREW_TEMP_U[]     = "7975652BF2A24F73A2DA429AC3A83DFB";
-char BREW_SIZE_U[]     = "1CF1A1B203BB4F7CA28A8881169BEDE5";
-char WATER_LEVEL_U[]   = "538C13E23739428086AC91AB935A6CE1";
-char BEAN_LEVEL_U[]    = "67B0653508394365BF7F8AFC631E54A1";
-char BREW_STRENGTH_U[] = "DBFDE0AC2CF241269759042CD13E5681";
-char BREW_SCHEDULE_U[] = "6CED5F74565C4608BA3D043F4B0297F9";
-
-char START_BREW_H[]    = "FFFF";
-char BREW_STATE_H[]    = "FFFF";
-char BREW_TEMP_H[]     = "FFFF";
-char BREW_SIZE_H[]     = "FFFF";
-char WATER_LEVEL_H[]   = "FFFF";
-char BEAN_LEVEL_H[]    = "FFFF";
-char BREW_STRENGTH_H[] = "FFFF";
-char BREW_SCHEDULE_H[] = "FFFF";
-
-int START_BREW_V    = 0;
-int BREW_STATE_V    = 0;
-int BREW_TEMP_V     = 0;
-int BREW_SIZE_V     = 0;
-int WATER_LEVEL_V   = 0;
-int BEAN_LEVEL_V    = 0;
-int BREW_STRENGTH_V = 0;
-int BREW_SCHEDULE_V = 0;
+characteristic start_brew;
+characteristic brew_state;
+characteristic brew_temp;
+characteristic brew_size;
+characteristic water_level;
+characteristic bean_level;
+characteristic brew_strength;
+characteristic brew_schedule;
 
 #endif	/* PourOver_h */
 

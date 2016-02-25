@@ -6,7 +6,7 @@ void bluetooth_initialization() {
     buffer_init(&rx_buffer);
     receive_flag = 0;
 
-    /* Initialize bluetooth module */
+    /* Initialize BLE module */
     buffer_transmit_set("sn", "PourOver");
     buffer_transmit_set("sr", "20006400"); // Auto advertise, iOS mode, server only, no status string
     buffer_transmit_set("ss", "00000001");
@@ -32,8 +32,29 @@ void bluetooth_initialization() {
     buffer_empty(&tx_buffer);
     buffer_empty(&rx_buffer);
     DELAY_MS(500);
-    bluetooth_ls();
     receive_flag = 0;
+
+    // initialize micro variables
+    string_copy("11223344556677889900AABBCCDDEEFF", server.uuid);
+    
+    server.c[0] = &start_brew;
+    server.c[1] = &brew_state;
+    server.c[2] = &brew_temp;
+    server.c[3] = &brew_size;
+    server.c[4] = &water_level;
+    server.c[5] = &bean_level;
+    server.c[6] = &brew_strength;
+    server.c[7] = &brew_schedule;
+    
+    string_copy("75DC2F8004F242F48AB048D642153C91", start_brew.uuid);
+    string_copy("D2025D7957084FF1BC76C01E1ABEBB4D", brew_state.uuid);
+    string_copy("7975652BF2A24F73A2DA429AC3A83DFB", brew_temp.uuid);
+    string_copy("1CF1A1B203BB4F7CA28A8881169BEDE5", brew_size.uuid);
+    string_copy("538C13E23739428086AC91AB935A6CE1", water_level.uuid);
+    string_copy("67B0653508394365BF7F8AFC631E54A1", bean_level.uuid);
+    string_copy("DBFDE0AC2CF241269759042CD13E5681", brew_strength.uuid);
+    string_copy("6CED5F74565C4608BA3D043F4B0297F9", brew_schedule.uuid);
+    bluetooth_ls();
 }
 
 void bluetooth_ls() {
@@ -43,7 +64,7 @@ void bluetooth_ls() {
     char h[5];
     
     // list all characteristics associated with the service
-    while (!buffer_transmit_check("ls", SERVER_UUID));
+    while (!buffer_transmit_check("ls", server.uuid));
     
     buffer_read_segment(&rx_buffer, temp);
     
@@ -66,22 +87,12 @@ void bluetooth_ls() {
         }
         h[i - offset] = '\0';
         
-        if (string_compare(u, START_BREW_U))
-            string_copy(h, START_BREW_H);
-        else if (string_compare(u, BREW_STATE_U))
-            string_copy(h, BREW_STATE_H);
-        else if (string_compare(u, BREW_TEMP_U))
-            string_copy(h, BREW_TEMP_H);
-        else if (string_compare(u, BREW_SIZE_U))
-            string_copy(h, BREW_SIZE_H);
-        else if (string_compare(u, WATER_LEVEL_U))
-            string_copy(h, WATER_LEVEL_H);
-        else if (string_compare(u, BEAN_LEVEL_U))
-            string_copy(h, BEAN_LEVEL_H);
-        else if (string_compare(u, BREW_STRENGTH_U))
-            string_copy(h, BREW_STRENGTH_H);
-        else if (string_compare(u, BREW_SCHEDULE_U))
-            string_copy(h, BREW_SCHEDULE_H);
+        for (i = 0; i < CHARACTERISTIC_COUNT; i++) {
+            if (string_compare(u, server.c[i]->uuid)) { 
+                string_copy(h, server.c[i]->handle);
+                break;
+            }
+        }
         
         buffer_read_segment(&rx_buffer, temp);
     }
@@ -139,37 +150,11 @@ char bluetooth_wv() {
     }
     d[i - offset] = '\0';
     
-    if (string_compare(h, START_BREW_H)) {
-        START_BREW_V = hexstring_to_int(d);
-        return 1;
-    }
-    else if (string_compare(h, BREW_STATE_H)) {
-        BREW_STATE_V = hexstring_to_int(d);
-        return 2;
-    }
-    else if (string_compare(h, BREW_TEMP_H)) {
-        BREW_TEMP_V = hexstring_to_int(d);
-        return 3;
-    }
-    else if (string_compare(h, BREW_SIZE_H)) {
-        BREW_SIZE_V = hexstring_to_int(d);
-        return 4;
-    }
-    else if (string_compare(h, WATER_LEVEL_H)) {
-        WATER_LEVEL_V = hexstring_to_int(d);
-        return 5;
-    }
-    else if (string_compare(h, BEAN_LEVEL_H)) {
-        BEAN_LEVEL_V = hexstring_to_int(d);
-        return 6;
-    }
-    else if (string_compare(h, BREW_STRENGTH_H)) {
-        BREW_STRENGTH_V = hexstring_to_int(d);
-        return 7;
-    }
-    else if (string_compare(h, BREW_SCHEDULE_H)) {
-        BREW_SCHEDULE_V = hexstring_to_int(d);
-        return 8;
+    for (i = 0; i < CHARACTERISTIC_COUNT; i++) {
+        if (string_compare(h, server.c[i]->handle)) { 
+            server.c[i]->value = hexstring_to_int(d);
+            return i;
+        }
     }
     
     return -1;
