@@ -68,4 +68,3 @@ void bluetooth_shr(char *, char *);
 char bluetooth_wv();
 
 #endif	/* PourOver_bluetooth_h */
-

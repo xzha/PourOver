@@ -41,6 +41,9 @@ void timer_initialization(void) {
 
     T2CONbits.TON = 1;                  // Start 16-bit timer2 (500Hz)
     
+    IFS0bits.T2IF = 0;                  // Clear time2 interrupt status flag
+    IEC0bits.T2IE = 1;                  // Enable timer 2
+    
     /* Timer3 */
     T3CON = 0x00;                       // Stop the timer2 and reset control reg.
     
@@ -55,10 +58,15 @@ void timer_initialization(void) {
 
 void port_initialization(void) {
     /* Port F */
-    TRISFbits.TRISF4 = 0;               // RF4 as output (BT module wake pin)
-    TRISFbits.TRISF5 = 1;               // RF5 as input (BT module connection pin)
+    //TRISFbits.TRISF4 = 0;               // RF4 as output (BT module wake pin)
+    //TRISFbits.TRISF5 = 1;               // RF5 as input (BT module connection pin)
     
-    PORTFbits.RF4 = 1;                  // Wake up BT module
+    //PORTFbits.RF4 = 1;                  // Wake up BT module
+    
+    TRISDbits.TRISD10 = 0;                // LED Power as output
+    TRISDbits.TRISD11 = 1;                // Push Button sense as input
+    
+    PORTDbits.RD10 = 0;
 }
 
 void uart_initialization(void) {
@@ -77,7 +85,26 @@ void uart_initialization(void) {
     IEC0bits.U1RXIE = 1;                // Enable Receive Interrupt
     
     DELAY_MS(1);
+    
+    /* UART2 */
+    U2MODE = 0;                         // Clear UART2 mode register
+    U2STA = 0;                          // Stop UART2 and clear status register
+    U2BRG = BAUD_9600;                      // Set baudrate generation (25 for 9600 baud)
+
+    U2MODE = 0x8000;                    // Enable UART2 for 8-bit data
+                                        // no parity, 1 STOP bit
+
+    U2STAbits.UTXEN = 1;                // Enable Transmit
+
+    U2STAbits.URXISEL = 0;
+    IEC1bits.U2RXIE = 1;                // Enable Receive Interrupt
+    IFS1bits.U2TXIF = 0;                // Clear TX Interrupt flag
+    IFS1bits.U2RXIF = 0;                // Clear TX Interrupt flag
+
+    DELAY_MS(1);
 }
+
+
 
 void oc_initialization(void) {
     /* PWM1 for pump */

@@ -58,4 +58,3 @@ characteristic brew_strength;
 characteristic brew_schedule;
 
 #endif	/* PourOver_h */
-

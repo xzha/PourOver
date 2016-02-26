@@ -98,6 +98,7 @@ void bluetooth_ls() {
     }
 }
 
+// fixme: update handle->value
 void bluetooth_shw(char * h, char * d) {
     char shw[30];
     
