@@ -98,31 +98,34 @@ void bluetooth_ls() {
     }
 }
 
-// fixme: update handle->value
-void bluetooth_shw(char * h, char * d) {
+void bluetooth_shw(characteristic c, int d) {
     char shw[30];
+    char temp[25];
+    
+    int_to_hexstring(d, temp);
     
     string_copy("shw,", shw);
-    string_copy(h,   &shw[string_len(shw)]);
+    string_copy(c.handle,   &shw[string_len(shw)]);
     string_copy(",", &shw[string_len(shw)]);
-    string_copy(d,   &shw[string_len(shw)]);
+    string_copy(temp,   &shw[string_len(shw)]);
     
     while (!buffer_transmit_check(shw, "AOK"));
 }
 
-void bluetooth_shr(char * h, char * d) {
+int bluetooth_shr(characteristic c) {
     char shr[10];
+    char temp[25];
     
     string_copy("shr,", shr);
-    string_copy(h, &shr[string_len(shr) + 1]);
+    string_copy(c.handle, &shr[string_len(shr) + 1]);
     
     buffer_transmit(shr);
+    buffer_read_segment(&rx_buffer, temp);
     
-    buffer_read_segment(&rx_buffer, d);
+    return hexstring_to_int(temp);
 }
 
 char bluetooth_wv() {
-    // WV,000B,123456789DEF.
     char temp[50];
     
     char d[35];

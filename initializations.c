@@ -41,11 +41,8 @@ void timer_initialization(void) {
 
     T2CONbits.TON = 1;                  // Start 16-bit timer2 (500Hz)
     
-    IFS0bits.T2IF = 0;                  // Clear time2 interrupt status flag
-    IEC0bits.T2IE = 1;                  // Enable timer 2
-    
     /* Timer3 */
-    T3CON = 0x00;                       // Stop the timer2 and reset control reg.
+    T3CON = 0x00;                       // Stop the timer3 and reset control reg.
     
     TMR3 = 0x00;                        // Clear contents of timer register
     PR3 = 0x1F3F;                       // Period Register (7999)
@@ -53,20 +50,24 @@ void timer_initialization(void) {
     T3CONbits.TCS = 0;                  // Internal 4Mhz instruction cycle (FCY)
     T3CONbits.TCKPS = 0;                // 1:1 Prescale (4Mhz/1 = 4Mhz)
 
-    T3CONbits.TON = 1;                  // Start 16-bit timer2 (500Hz)
+    T3CONbits.TON = 1;                  // Start 16-bit timer3 (500Hz)
 }
 
 void port_initialization(void) {
+    /* Port B */
+    AD1PCFGbits.PCFG2 = 1;              // AN2 as digital pin
+    AD1PCFGbits.PCFG3 = 1;              // AN3 as digital pin
+    
+    TRISBbits.TRISB3 = 0;               // LED Power as output
+    TRISBbits.TRISB2 = 1;               // Push Button sense as input
+    
+    PORTBbits.RB3 = 0;                  // Turn off PB LED
+    
     /* Port F */
-    //TRISFbits.TRISF4 = 0;               // RF4 as output (BT module wake pin)
-    //TRISFbits.TRISF5 = 1;               // RF5 as input (BT module connection pin)
+    TRISFbits.TRISF4 = 0;               // RF4 as output (BT module wake pin)
+    TRISFbits.TRISF5 = 1;               // RF5 as input (BT module connection pin)
     
-    //PORTFbits.RF4 = 1;                  // Wake up BT module
-    
-    TRISDbits.TRISD10 = 0;                // LED Power as output
-    TRISDbits.TRISD11 = 1;                // Push Button sense as input
-    
-    PORTDbits.RD10 = 0;
+    PORTFbits.RF4 = 1;                  // Wake up BT module
 }
 
 void uart_initialization(void) {
@@ -85,34 +86,15 @@ void uart_initialization(void) {
     IEC0bits.U1RXIE = 1;                // Enable Receive Interrupt
     
     DELAY_MS(1);
-    
-    /* UART2 */
-    U2MODE = 0;                         // Clear UART2 mode register
-    U2STA = 0;                          // Stop UART2 and clear status register
-    U2BRG = BAUD_9600;                      // Set baudrate generation (25 for 9600 baud)
-
-    U2MODE = 0x8000;                    // Enable UART2 for 8-bit data
-                                        // no parity, 1 STOP bit
-
-    U2STAbits.UTXEN = 1;                // Enable Transmit
-
-    U2STAbits.URXISEL = 0;
-    IEC1bits.U2RXIE = 1;                // Enable Receive Interrupt
-    IFS1bits.U2TXIF = 0;                // Clear TX Interrupt flag
-    IFS1bits.U2RXIF = 0;                // Clear TX Interrupt flag
-
-    DELAY_MS(1);
 }
-
-
 
 void oc_initialization(void) {
     /* PWM1 for pump */
     OC1CONbits.OCM = 0b000;             // Disable Output Compare Module
     OC1CONbits.OCTSEL = 0;              // Select Timer 2 as output compare time base
 
-    OC1RS = 0x0FA0;                     // Normalized duty cycle (4000)
-    OC1R = 0xFA00;                      // Initial duty cycle (64000)
+    OC1RS = 0x0000;                     // Normalized duty cycle (0)
+    OC1R = 0x0000;                      // Initial duty cycle (0)
 
     IFS0bits.OC1IF = 0;                 // Clear Output Compare 1 interrupt flag
     IEC0bits.OC1IE = 1;                 // Enable Output Compare 1 interrupts
@@ -121,10 +103,10 @@ void oc_initialization(void) {
     
     /* PWM2 for servo 1 */
     OC2CONbits.OCM = 0b000;             // Disable Output Compare Module
-    OC2CONbits.OCTSEL = 0;              // Select Timer 2 as output compare time base
+    OC2CONbits.OCTSEL = 1;              // Select Timer 3 as output compare time base
 
-    OC2RS = 0x0FA0;                     // Normalized duty cycle (4000)
-    OC2R = 0xFA00;                      // Initial duty cycle (64000)
+    OC2RS = 0x0000;                     // Normalized duty cycle (0)
+    OC2R = 0x0000;                      // Initial duty cycle (0)
 
     IFS0bits.OC2IF = 0;                 // Clear Output Compare 2 interrupt flag
     IEC0bits.OC2IE = 1;                 // Enable Output Compare 2 interrupts
@@ -133,10 +115,10 @@ void oc_initialization(void) {
     
     /* PWM3 for servo 2 */
     OC3CONbits.OCM = 0b000;             // Disable Output Compare Module
-    OC3CONbits.OCTSEL = 0;              // Select Timer 2 as output compare time base
+    OC3CONbits.OCTSEL = 1;              // Select Timer 3 as output compare time base
 
-    OC3RS = 0x0FA0;                     // Normalized duty cycle (4000)
-    OC3R = 0xFA00;                      // Initial duty cycle (64000)
+    OC3RS = 0x0000;                     // Normalized duty cycle (0)
+    OC3R = 0x0000;                      // Initial duty cycle (0)
 
     IFS1bits.OC3IF = 0;                 // Clear Output Compare 3 interrupt flag
     IEC1bits.OC3IE = 1;                 // Enable Output Compare 3 interrupts
@@ -147,8 +129,8 @@ void oc_initialization(void) {
     OC4CONbits.OCM = 0b000;             // Disable Output Compare Module
     OC4CONbits.OCTSEL = 1;              // Select Timer 3 as output compare time base
 
-    OC4RS = 0x0FA0;                     // Normalized duty cycle (4000)
-    OC4R = 0xFA00;                      // Initial duty cycle (64000)
+    OC4RS = 0x0000;                     // Normalized duty cycle (0)
+    OC4R = 0x0000;                      // Initial duty cycle (0)
 
     IFS1bits.OC4IF = 0;                 // Clear Output Compare 4 interrupt flag
     IEC1bits.OC4IE = 1;                 // Enable Output Compare 4 interrupts

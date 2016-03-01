@@ -63,8 +63,8 @@ extern characteristic brew_schedule;
 /* Functions*/
 void bluetooth_initialization();
 void bluetooth_ls();
-void bluetooth_shw(char *, char *);
-void bluetooth_shr(char *, char *);
+void bluetooth_shw(characteristic, int);
+int bluetooth_shr(characteristic);
 char bluetooth_wv();
 
 #endif	/* PourOver_bluetooth_h */

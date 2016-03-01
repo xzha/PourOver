@@ -36,7 +36,7 @@
 /* Functions */
 int power(int, int);
 
-void oc_frequency(long int, char);
+void timer_frequency(long int, char);
 void oc_dutycycle(float, char);
 
 #endif	/* PourOver_outputcompare_h */

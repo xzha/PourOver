@@ -42,30 +42,25 @@
 #define AVG 10
 #define CALIBRATION_FACTOR -466
 
-//float currentMeas = 0;
-//float oldMeas = 0;
-//float creep = 0;
-
 /* Functions */
-int generateClock();
-void powerUp();
-void powerDown();
-char shiftIn();
-int isReady();
-long readData();
-long readAverage(int);
+void ls_power_up();
+void ls_power_down();
+char ls_shift_in();
+int ls_ready();
+long ls_ready_data();
+long ls_read_average(int);
 
-void setGain();
-double getValue(int);
-float getUnits(int);
-void tare(int);
-void setScale(float);
-float getScale();
-void setOffset(long);
-long getOffset();
+void ls_set_gain();
+double ls_get_value(int);
+float ls_get_units(int);
+void ls_tare(int);
+void ls_set_scale(float);
+float ls_get_scale();
+void ls_set_offset(long);
+long ls_get_offset();
 
-float averageWeight();
-void initialize();
-void calcCreep();
+float ls_average_weight();
+void ls_initialization();
+void ls_calc_creep();
 
 #endif	/* PourOver_loadSensor_h */

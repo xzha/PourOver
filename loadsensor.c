@@ -17,7 +17,7 @@ float currentMeas = 0;
 float oldMeas = 0;
 float creep = 0;
 
-void setGain(int gain)
+void ls_set_gain(int gain)
 {
     switch(gain)
     {
@@ -35,16 +35,16 @@ void setGain(int gain)
     Tx_CLK;
     Port_CLK = 0;
     
-    readData();
+    ls_ready_data();
 }
 
-void powerUp()
+void ls_power_up()
 {
     Tx_CLK;
     Port_CLK = 0;
 }
 
-void powerDown()
+void ls_power_down()
 {
     Tx_CLK;
     Port_CLK = 0;
@@ -53,7 +53,7 @@ void powerDown()
     DELAY_US(60);
 }
 
-char shiftIn()
+char ls_shift_in()
 {
     char val = 0;
     int index;
@@ -77,14 +77,14 @@ char shiftIn()
     return(val);
 }
 
-int isReady()
+int ls_ready()
 {
     Rx_DATA;
     
     return(Port_DATA != 1);
 }
 
-long readData()
+long ls_ready_data()
 {
     char temp0, temp1, temp2;
     int index;
@@ -92,11 +92,11 @@ long readData()
     unsigned long value = 0;
     unsigned long value1 = 0, value2 = 0, value3 = 0, value4 = 0;
     
-    while(!isReady());
+    while(!ls_ready());
     
-    temp2 = shiftIn();
-    temp1 = shiftIn();
-    temp0 = shiftIn();
+    temp2 = ls_shift_in();
+    temp1 = ls_shift_in();
+    temp0 = ls_shift_in();
     
     DELAY_US(1);
     
@@ -138,37 +138,32 @@ long readData()
     
     value = value1 | value2 | value3 | value4;
     
-//    value = (((unsigned long) filler) << 24)
-//            | (((unsigned long) temp2) << 16)
-//            | (((unsigned long) temp1) << 8)
-//            | ((unsigned long) temp0);
-    
     return(value + 1);
 }
 
-long readAverage(int times)
+long ls_read_average(int times)
 {
     int index;
     long sum = 0;
     for(index = 0; index < times; index++)
     {
-        sum += readData();
+        sum += ls_ready_data();
     }
     
     return(sum / times);
 }
 
-double getValue(int times)
+double ls_get_value(int times)
 {
-    return(readAverage(times) - LOAD_OFFSET);
+    return(ls_read_average(times) - LOAD_OFFSET);
 }
 
-float getUnits(int times)
+float ls_get_units(int times)
 {
-    return(getValue(times) / LOAD_SCALE);
+    return(ls_get_value(times) / LOAD_SCALE);
 }
 
-void tare(int times)
+void ls_tare(int times)
 {
     int i;
     
@@ -178,35 +173,35 @@ void tare(int times)
         creepAvg[i] = 0;
     }
     
-    long sum = readAverage(times);
-    setOffset(sum);
+    long sum = ls_read_average(times);
+    ls_set_offset(sum);
 }
 
-void setScale(float scale)
+void ls_set_scale(float scale)
 {
     LOAD_SCALE = scale;
 }
 
-float getScale()
+float ls_get_scale()
 {
     return(LOAD_SCALE);
 }
 
-void setOffset(long offset)
+void ls_set_offset(long offset)
 {
     LOAD_OFFSET = offset;
 }
 
-long getOffset()
+long ls_get_offset()
 {
     return(LOAD_OFFSET);
 }
 
-float averageWeight()
+float ls_average_weight()
 {
     unsigned int i;
     
-    totalValue = getUnits(1);
+    totalValue = ls_get_units(1);
     
     total = 0;
     
@@ -224,11 +219,11 @@ float averageWeight()
     return(total);
 }
 
-void initialize()
+void ls_initialization()
 {
     unsigned int i;
     
-    powerUp();
+    ls_power_up();
     
     for(i = 0; i < AVG; i++)
     {
@@ -236,13 +231,13 @@ void initialize()
         creepAvg[i] = 0;
     }
     
-    setScale(CALIBRATION_FACTOR);
+    ls_set_scale(CALIBRATION_FACTOR);
     DELAY_MS(10);
-    tare(50);
+    ls_tare(50);
     DELAY_MS(10);
 }
 
-void calcCreep()
+void ls_calc_creep()
 {
     unsigned int i;
     float tempCreep;
