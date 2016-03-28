@@ -20,26 +20,38 @@
  */
 
 /* 
- * File: initializations.h   
- * Author: Xiongyao Zha
- * Comments: All initializations are listed here.
+ * File: capacitivesensing.h   
+ * Author: 
+ * Comments: Implementation of capacitive sensing.
  */
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef PourOver_initializations_h
-#define	PourOver_initializations_h
+#ifndef PourOver_capacitivesensing_h
+#define	PourOver_capacitivesensing_h
 
-#include <xc.h> // include processor files - each processor file is guarded.
+#include <xc.h> // include processor files - each processor file is guarded.  
 #include "definitions.h"
 
+/* Constants */
+#define port_receive PORTBbits.RB1
+#define port_send PORTBbits.RB0
+#define sendPin_input TRISBbits.TRISB0 = 1
+#define sendPin_output TRISBbits.TRISB0 = 0
+#define receivePin_input TRISBbits.TRISB1 = 1
+#define receivePin_output TRISBbits.TRISB1 = 0
+
+#define FIVE_VOLT_TOLERANCE_WORKAROUND
+/* Structures */
+
+/* Variables */
+
 /* Functions */
-void oscillator_initialization(void);
-void port_initialization(void);
-void uart_initialization(void);
-void oc_initialization(void);
-void timer_initialization(void);
-void atd_initialization(void);
+void capacitive_sense_initialization(void);
+long capacitive_sense_raw(char samples);
+void set_CS_timeout_millis(unsigned long timeout_millis);
+void reset_CS_autocal();
+void set_CS_autocal_millis(unsigned long autoCal_millis);
+int sense_one_cycle(void);
 
-#endif	/* PourOver_initializations_h */
-
+#endif	/* PourOver_capacitivesensing_h */

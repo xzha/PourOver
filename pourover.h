@@ -38,6 +38,8 @@
 #include "bluetooth.h"
 #include "temperature.h"
 #include "loadsensor.h"
+#include "capacitivesensing.h"
+#include "lightsensor.h"
 
 /* Variables */
 volatile buffer tx_buffer;

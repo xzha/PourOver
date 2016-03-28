@@ -20,26 +20,22 @@
  */
 
 /* 
- * File: initializations.h   
- * Author: Xiongyao Zha
- * Comments: All initializations are listed here.
+ * File: lightsensor.h   
+ * Author: 
+ * Comments: Implementation of capacitive sensing.
  */
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef PourOver_initializations_h
-#define	PourOver_initializations_h
+#ifndef PourOver_lightsensor_h
+#define	PourOver_lightsensor_h
 
-#include <xc.h> // include processor files - each processor file is guarded.
+#include <xc.h> // include processor files - each processor file is guarded.  
 #include "definitions.h"
 
 /* Functions */
-void oscillator_initialization(void);
-void port_initialization(void);
-void uart_initialization(void);
-void oc_initialization(void);
-void timer_initialization(void);
-void atd_initialization(void);
+int get_light_value();
 
-#endif	/* PourOver_initializations_h */
+#endif	/* PourOver_lightsensor_h */
+
 

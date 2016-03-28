@@ -10,9 +10,6 @@ float totalValue = 0;
 float total = 0;
 float diff = 0;
 
-//extern float creep;
-//extern float currentMeas;
-//extern float oldMeas;
 float currentMeas = 0;
 float oldMeas = 0;
 float creep = 0;
@@ -68,7 +65,6 @@ char ls_shift_in()
         if(Port_DATA != 0)
         {
             val |= (1 << (7-index));
-            //val |= (1 << index);
         }
         
         Port_CLK = 0;

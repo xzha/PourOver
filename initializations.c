@@ -55,19 +55,28 @@ void timer_initialization(void) {
 
 void port_initialization(void) {
     /* Port B */
-    AD1PCFGbits.PCFG2 = 1;              // AN2 as digital pin
     AD1PCFGbits.PCFG3 = 1;              // AN3 as digital pin
+    TRISBbits.TRISB3 = 1;               // Push Button sense as input
     
-    TRISBbits.TRISB3 = 0;               // LED Power as output
-    TRISBbits.TRISB2 = 1;               // Push Button sense as input
+    AD1PCFGbits.PCFG4 = 1;              // AN4 as digital pin
+    TRISBbits.TRISB4 = 0;               // LED Power as output
     
-    PORTBbits.RB3 = 0;                  // Turn off PB LED
+    AD1PCFGbits.PCFG0 = 1;              // AN0 as digital pin
+    AD1PCFGbits.PCFG1 = 1;              // AN1 as digital pin
+    
+    PORTBbits.RB4 = 0;                  // Turn off PB LED
+    
+                                        // empty space for RB0 & RB1 for capacitive sensing
+    
+    /* Port D */
+                                        // empty space for load cell sensors RD6(sdat) & RD7(sck)
+                                        // empty space for temperature sensor RD13
     
     /* Port F */
-    TRISFbits.TRISF4 = 0;               // RF4 as output (BT module wake pin)
-    TRISFbits.TRISF5 = 1;               // RF5 as input (BT module connection pin)
+    //TRISFbits.TRISF4 = 0;               // RF4 as output (BT module wake pin)
+    //TRISFbits.TRISF5 = 1;               // RF5 as input (BT module connection pin)
     
-    PORTFbits.RF4 = 1;                  // Wake up BT module
+    //PORTFbits.RF4 = 1;                  // Wake up BT module
 }
 
 void uart_initialization(void) {
@@ -85,6 +94,23 @@ void uart_initialization(void) {
     IFS0bits.U1RXIF = 0;                // Clear TX Interrupt flag
     IEC0bits.U1RXIE = 1;                // Enable Receive Interrupt
     
+    DELAY_MS(1);
+    
+    /* UART2 */
+    U2MODE = 0;                         // Clear UART2 mode register
+    U2STA = 0;                          // Stop UART2 and clear status register
+    U2BRG = BAUD_9600;                      // Set baudrate generation (25 for 9600 baud)
+
+    U2MODE = 0x8000;                    // Enable UART2 for 8-bit data
+                                        // no parity, 1 STOP bit
+
+    U2STAbits.UTXEN = 1;                // Enable Transmit
+
+    U2STAbits.URXISEL = 0;
+    IEC1bits.U2RXIE = 1;                // Enable Receive Interrupt
+    IFS1bits.U2TXIF = 0;                // Clear TX Interrupt flag
+    IFS1bits.U2RXIF = 0;                // Clear TX Interrupt flag
+
     DELAY_MS(1);
 }
 
@@ -136,4 +162,20 @@ void oc_initialization(void) {
     IEC1bits.OC4IE = 1;                 // Enable Output Compare 4 interrupts
     
     OC4CONbits.OCM = 0b110;             // Output compare operation mode
+}
+
+void atd_initialization()
+{
+    AD1PCFGbits.PCFG2 = 0;              // AN2 as analog pin
+    TRISBbits.TRISB2 = 1;               // analog photo as input
+    AD1CON1 = 0;
+    AD1CON2 = 0;
+    AD1CON3 = 0;
+    AD1CHS = 0;
+    AD1CON1bits.SSRC = 0b111;           // Set ADC to internal counter (auto-convert)
+    AD1CON2bits.SMPI = 0b1111;          // Read every 16th sample
+    AD1CON3bits.SAMC = 0b01111;         // Sample time = 15Tad, Tad = Tcy
+    AD1CHSbits.CH0SA = 0b00010;         // Connect AN2 as positive input to MUXA
+    AD1CSSL = 0x0000;                   // No inputs are scanned
+    AD1CON1bits.ADON = 1;               // Turn ADC ON
 }

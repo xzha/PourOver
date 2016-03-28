@@ -1,4 +1,37 @@
 #include "pourover.h"
+#include<stdio.h>
+
+long fuel;
+int mod;
+char samples;
+
+void uart2_transmit(char s)
+{
+    while (U2STAbits.UTXBF);        // Wait for transmit buffer
+    while (!U2STAbits.TRMT);        // Wait for transmitter  
+    U2TXREG = s;                 // Place letter into transmit register
+}
+
+void uart2_transmit_string(char * s)
+{
+    while(*s)
+    {
+        uart2_transmit(*s++);
+    }
+    uart2_transmit('\r');
+    uart2_transmit('\n');
+}
+
+void uart2_transmit_long(long ll)
+{
+    char value[15];
+    
+    sprintf(value, "%ld", ll);
+    
+    uart2_transmit_string(value);
+    uart2_transmit('\r');
+    uart2_transmit('\n');
+}
 
 int main()
 {
@@ -13,7 +46,8 @@ int main()
     timer_initialization();             // timer1: 1Hz
                                         // timer2: 500Hz
                                         // timer3: 500Hz
-    bluetooth_initialization();
+    atd_initialization();
+    //bluetooth_initialization();
     ls_initialization();
     // pwm intialization
     timer_frequency(500, 2); // pump    @ timer2
@@ -21,6 +55,7 @@ int main()
                              // servo2  @ timer3 
                              // ssrelay @ timer3
     // pwm initialization
+    capacitive_sense_initialization();
     
     while(1)
     {
@@ -50,7 +85,7 @@ int main()
                 break;
             case 2: //brew_temp 7975652bf2a24f73a2da429ac3a83dfb
                 oc_dutycycle(50, 1); // pump
-                oc_dutycycle(15, 2); // servo1
+                oc_dutycycle(10, 2); // servo1
                 oc_dutycycle(10, 3); // servo2
                 break;
             case 3:
@@ -61,7 +96,7 @@ int main()
                 break;
             case 6: //brew_strength dbfde0ac2cf241269759042cd13e5681
                 oc_dutycycle(25, 1); // pump
-                oc_dutycycle(10, 2);  // servo1
+                oc_dutycycle(5, 2);  // servo1
                 oc_dutycycle(5, 3);  // servo2
                 break;
             case 7:
