@@ -63,8 +63,8 @@ extern characteristic bt_brew_schedule;
 /* Functions*/
 void bt_initialization();
 void bt_ls();
-void bt_shw(characteristic, int);
-int bt_shr(characteristic);
+void bt_shw(characteristic * c, int d);
+void bt_shr(characteristic * c);
 char bt_wv();
 
 #endif	/* PourOver_bluetooth_h */
