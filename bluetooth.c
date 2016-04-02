@@ -1,6 +1,6 @@
 #include "bluetooth.h"
 
-void bluetooth_initialization() {
+void bt_initialization() {
     /* Initialize buffer */
     buffer_init(&tx_buffer);
     buffer_init(&rx_buffer);
@@ -37,27 +37,27 @@ void bluetooth_initialization() {
     // initialize micro variables
     string_copy("11223344556677889900AABBCCDDEEFF", server.uuid);
     
-    server.c[0] = &start_brew;
-    server.c[1] = &brew_state;
-    server.c[2] = &brew_temp;
-    server.c[3] = &brew_size;
-    server.c[4] = &water_level;
-    server.c[5] = &bean_level;
-    server.c[6] = &brew_strength;
-    server.c[7] = &brew_schedule;
+    server.c[0] = &bt_start_brew;
+    server.c[1] = &bt_brew_state;
+    server.c[2] = &bt_brew_temp;
+    server.c[3] = &bt_brew_size;
+    server.c[4] = &bt_water_level;
+    server.c[5] = &bt_bean_level;
+    server.c[6] = &bt_brew_strength;
+    server.c[7] = &bt_brew_schedule;
     
-    string_copy("75DC2F8004F242F48AB048D642153C91", start_brew.uuid);
-    string_copy("D2025D7957084FF1BC76C01E1ABEBB4D", brew_state.uuid);
-    string_copy("7975652BF2A24F73A2DA429AC3A83DFB", brew_temp.uuid);
-    string_copy("1CF1A1B203BB4F7CA28A8881169BEDE5", brew_size.uuid);
-    string_copy("538C13E23739428086AC91AB935A6CE1", water_level.uuid);
-    string_copy("67B0653508394365BF7F8AFC631E54A1", bean_level.uuid);
-    string_copy("DBFDE0AC2CF241269759042CD13E5681", brew_strength.uuid);
-    string_copy("6CED5F74565C4608BA3D043F4B0297F9", brew_schedule.uuid);
-    bluetooth_ls();
+    string_copy("75DC2F8004F242F48AB048D642153C91", bt_start_brew.uuid);
+    string_copy("D2025D7957084FF1BC76C01E1ABEBB4D", bt_brew_state.uuid);
+    string_copy("7975652BF2A24F73A2DA429AC3A83DFB", bt_brew_temp.uuid);
+    string_copy("1CF1A1B203BB4F7CA28A8881169BEDE5", bt_brew_size.uuid);
+    string_copy("538C13E23739428086AC91AB935A6CE1", bt_water_level.uuid);
+    string_copy("67B0653508394365BF7F8AFC631E54A1", bt_bean_level.uuid);
+    string_copy("DBFDE0AC2CF241269759042CD13E5681", bt_brew_strength.uuid);
+    string_copy("6CED5F74565C4608BA3D043F4B0297F9", bt_brew_schedule.uuid);
+    bt_ls();
 }
 
-void bluetooth_ls() {
+void bt_ls() {
     char temp[50];
 
     char u[35];
@@ -98,7 +98,7 @@ void bluetooth_ls() {
     }
 }
 
-void bluetooth_shw(characteristic c, int d) {
+void bt_shw(characteristic c, int d) {
     char shw[30];
     char temp[25];
     
@@ -112,7 +112,7 @@ void bluetooth_shw(characteristic c, int d) {
     while (!buffer_transmit_check(shw, "AOK"));
 }
 
-int bluetooth_shr(characteristic c) {
+int bt_shr(characteristic c) {
     char shr[10];
     char temp[25];
     
@@ -125,7 +125,7 @@ int bluetooth_shr(characteristic c) {
     return hexstring_to_int(temp);
 }
 
-char bluetooth_wv() {
+char bt_wv() {
     char temp[50];
     
     char d[35];

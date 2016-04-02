@@ -48,9 +48,9 @@
 #define ERROR_TEMP 0x7FFF
 
 /* Functions */
-char Reset_18B20();
-void Write_18B20(char);
-char Read_18B20();
-int read_temperature();
+char ts_reset();
+void ts_write(char);
+char ts_read_byte();
+int ts_read();
 
 #endif	/* PourOver_temperature_h */

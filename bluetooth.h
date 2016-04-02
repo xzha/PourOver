@@ -51,20 +51,20 @@ typedef struct {
 
 /* Variables*/
 extern service server;
-extern characteristic start_brew;
-extern characteristic brew_state;
-extern characteristic brew_temp;
-extern characteristic brew_size;
-extern characteristic water_level;
-extern characteristic bean_level;
-extern characteristic brew_strength;
-extern characteristic brew_schedule;
+extern characteristic bt_start_brew;
+extern characteristic bt_brew_state;
+extern characteristic bt_brew_temp;
+extern characteristic bt_brew_size;
+extern characteristic bt_water_level;
+extern characteristic bt_bean_level;
+extern characteristic bt_brew_strength;
+extern characteristic bt_brew_schedule;
 
 /* Functions*/
-void bluetooth_initialization();
-void bluetooth_ls();
-void bluetooth_shw(characteristic, int);
-int bluetooth_shr(characteristic);
-char bluetooth_wv();
+void bt_initialization();
+void bt_ls();
+void bt_shw(characteristic, int);
+int bt_shr(characteristic);
+char bt_wv();
 
 #endif	/* PourOver_bluetooth_h */
