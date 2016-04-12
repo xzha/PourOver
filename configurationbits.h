@@ -33,9 +33,9 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 
 // CONFIG2
-#pragma config POSCMOD = NONE           // Primary Oscillator Select (Primary oscillator disabled)
+#pragma config POSCMOD = EC             // Primary Oscillator Select (EC Oscillator mode selected)
 #pragma config OSCIOFNC = OFF           // Primary Oscillator Output Function (OSC2/CLKO/RC15 functions as CLKO (FOSC/2))
-#pragma config FCKSM = CSDCMD           // Clock Switching and Monitor (Clock switching and Fail-Safe Clock Monitor are disabled)
+#pragma config FCKSM = CSECMD           // Clock Switching and Monitor (Clock switching is enabled, Fail-Safe Clock Monitor is disabled)
 #pragma config FNOSC = FRC              // Oscillator Select (Fast RC Oscillator (FRC))
 #pragma config IESO = OFF               // Internal External Switch Over Mode (IESO mode (Two-Speed Start-up) disabled)
 

@@ -212,7 +212,7 @@ float ls_average_weight()
     total += totalValue;
     total /= AVG;
     
-    return(total);
+    return(total + 0.5);
 }
 
 void ls_initialization()

@@ -33,11 +33,11 @@
 #include <libpic30.h>
 
 /* Constants */
-#define FOSC 8000000                    // Fast RC Oscillator frequency (Hz)
+#define FOSC 32000000                   // ECPLL frequency (Hz)
 #define FCY FOSC/2                      // Internal instruction cycle clock
 
-#define BAUD_9600 ((FCY/9600)/16) - 1   // Designated baud rate for UART module
-#define BAUD_115200 ((FCY + 230400)/460800-1) 
+#define BAUD_9600 ((FCY/9600)/16) - 1
+#define BAUD_115200 (FCY + 230400)/460800 - 1 // Designated baud rate for UART module
 
 /* Macros */
 #define CYCLES_PER_MS ((unsigned long)(FCY * 0.001))        //instruction cycles per millisecond

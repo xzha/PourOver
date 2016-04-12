@@ -38,7 +38,7 @@
 #include "bluetooth.h"
 #include "temperature.h"
 #include "loadsensor.h"
-#include "capacitivesensing.h"
+// #include "capacitivesensing.h"
 #include "lightsensor.h"
 
 /* Enumerations */

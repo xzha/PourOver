@@ -42,12 +42,12 @@ void timer_frequency(long int frequency, char tn) {
         timer_scaler = 0b11;                  // timer prescale 1:256
 
     int scaler = power(8, timer_scaler);
-    timer_period = temp / scaler;
+    timer_period = temp / scaler - 1;
 
     switch(tn) {
         case 2: 
                 // change frequency
-                PR2 = (int) timer_period --;
+                PR2 = (int) timer_period;
                 T2CONbits.TCKPS = timer_scaler; 
                 timer2_period = timer_period;
                 
@@ -57,7 +57,7 @@ void timer_frequency(long int frequency, char tn) {
                 break;
         case 3: 
                 // change frequency
-                PR3 = (int) timer_period --; 
+                PR3 = (int) timer_period; 
                 T3CONbits.TCKPS = timer_scaler;
                 timer3_period = timer_period;
                 

@@ -7,9 +7,9 @@ int main()
                                         // after the peripherals are ready. 
     
     /* Initialize to default values */
-    oscillator_initialization();        // Clock:  8Mhz
-    port_initialization();
-    uart_initialization();              // UART1:  9600 Baud
+    port_initialization();              // Start up Bluetooth, OSC
+    oscillator_initialization();        // Clock:  32Mhz
+    uart_initialization();              // UART1:  115200 Baud
     oc_initialization();                // OC1, OC2, OC3, OC4: 0% duty cycle
     timer_initialization();             // timer1: 1Hz
                                         // timer2: 500Hz
@@ -17,7 +17,7 @@ int main()
     atd_initialization();
     bt_initialization();
     ls_initialization();
-    capacitive_sense_initialization();
+    // capacitive_sense_initialization();
     
     // pwm intialization
     timer_frequency(500, 2); // pump    @ timer2

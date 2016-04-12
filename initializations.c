@@ -1,17 +1,21 @@
 #include "initializations.h"
 
 void oscillator_initialization(void) {
-    /* Oscillator */
-    asm volatile ("mov #OSCCON, W1");
-    asm volatile ("mov.b #0x46, W2");   // Unlock sequence
-    asm volatile ("mov.b #0x57, W3");
-    asm volatile ("mov.b #0x02, W0");   // SOSCEN = 1
-    asm volatile ("mov.b W2, [W1]");
-    asm volatile ("mov.b W3, [W1]");
-    asm volatile ("mov.b W0, [W1]");
+    /* Primary oscillator */
+    asm volatile ("DISI #0x3FFF");
+    __builtin_write_OSCCONH(0b011);                             // Select new oscillator as ECPLL
+    __builtin_write_OSCCONL(OSCCON | 0x01);                     // Initiate oscillator switch
+    asm volatile ("DISI #0x0000");
+    while (OSCCONbits.COSC != 0b011 || OSCCONbits.OSWEN == 1);  // Wait for clock switch
+    while (OSCCONbits.LOCK != 1);                               // Wait for PLL
+    
+    /* Secondary oscillator */
+    asm volatile ("DISI #0x3FFF");
+    __builtin_write_OSCCONL(OSCCON | 0x02);                     // Enable secondary oscillator
+    asm volatile ("DISI #0x0000");
     
     /* Clock  */
-    CLKDIVbits.RCDIV = 0b000;           // Divide by 1 (8MHz)
+    CLKDIV = 0x0000;           // 1:1 ratio for CPU and peripheral clock
 }
 
 void timer_initialization(void) {
@@ -33,10 +37,10 @@ void timer_initialization(void) {
     T2CON = 0x00;                       // Stop the timer2 and reset control reg.
     
     TMR2 = 0x00;                        // Clear contents of timer register
-    PR2 = 0x1F3F;                       // Period Register (7999)
+    PR2 = 0x7CFF;                       // Period Register (31999)
     
-    T2CONbits.TCS = 0;                  // Internal 4Mhz instruction cycle (FCY)
-    T2CONbits.TCKPS = 0;                // 1:1 Prescale (4Mhz/1 = 4Mhz)
+    T2CONbits.TCS = 0;                  // Internal 16Mhz instruction cycle (FCY)
+    T2CONbits.TCKPS = 0;                // 1:1 Prescale (16Mhz/1 = 16Mhz)
     T2CONbits.T32 = 0;                  // Independent 16-bit timer
 
     T2CONbits.TON = 1;                  // Start 16-bit timer2 (500Hz)
@@ -48,10 +52,10 @@ void timer_initialization(void) {
     T3CON = 0x00;                       // Stop the timer3 and reset control reg.
     
     TMR3 = 0x00;                        // Clear contents of timer register
-    PR3 = 0x1F3F;                       // Period Register (7999)
+    PR3 = 0x7CFF;                       // Period Register (31999)
     
-    T3CONbits.TCS = 0;                  // Internal 4Mhz instruction cycle (FCY)
-    T3CONbits.TCKPS = 0;                // 1:1 Prescale (4Mhz/1 = 4Mhz)
+    T3CONbits.TCS = 0;                  // Internal 16Mhz instruction cycle (FCY)
+    T3CONbits.TCKPS = 0;                // 1:1 Prescale (16Mhz/1 = 16Mhz)
 
     T3CONbits.TON = 1;                  // Start 16-bit timer3 (500Hz)
 }
@@ -59,7 +63,7 @@ void timer_initialization(void) {
 void port_initialization(void) {
     /* Port A */
     TRISAbits.TRISA5 = 0;               // RA5 as output (OSC1 standby pin)
-    PORTAbits.RA5 = 0;                  // Put OSC1 in high impedance
+    PORTAbits.RA5 = 1;                  // Put OSC1 in high impedance
 
     /* Port B */
     // RB0 & RB1 for capacitive sensing
@@ -103,9 +107,9 @@ void uart_initialization(void) {
     U1MODEbits.STSEL = 0;               // 1-Stop bit
     U1MODEbits.PDSEL = 0;               // No Parity, 8-Data bits
     U1MODEbits.ABAUD = 0;               // Auto-Baud disabled
-    U1MODEbits.BRGH = 0;                // Standard-Speed mode
+    U1MODEbits.BRGH = 1;                // High-Speed mode
     
-    U1BRG = BAUD_9600;                  // Baud rate
+    U1BRG = BAUD_115200;                // Baud rate
     
     U1STAbits.UTXISEL0 = 0;             // Interrupt when receive buffer is 1/4 full
     U1STAbits.UTXISEL0 = 0;

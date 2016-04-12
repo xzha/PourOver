@@ -8,6 +8,7 @@ void bt_initialization() {
     
     /* Initialize BLE module */
     buffer_transmit_set("sn", "PourOver");
+    buffer_transmit_set("sb", "4");
     buffer_transmit_set("sr", "20006400"); // Auto advertise, iOS mode, server only, no status string
     buffer_transmit_set("ss", "00000001");
     while(!buffer_transmit_check("pz", "AOK"));
