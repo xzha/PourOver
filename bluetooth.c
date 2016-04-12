@@ -1,11 +1,11 @@
 #include "bluetooth.h"
+#include <stdio.h>
 
-void bt_initialization() {
+void bt_initialization() {    
     /* Initialize buffer */
-    buffer_init(&tx_buffer);
-    buffer_init(&rx_buffer);
+    buffer_empty(&rx_buffer);
     receive_flag = 0;
-
+    
     /* Initialize BLE module */
     buffer_transmit_set("sn", "PourOver");
     buffer_transmit_set("sr", "20006400"); // Auto advertise, iOS mode, server only, no status string
@@ -17,23 +17,23 @@ void bt_initialization() {
     
     // characteristics
     while(!buffer_transmit_check("pc,75dc2f8004f242f48ab048d642153c91,0A,01", "AOK")); // start brew
-    while(!buffer_transmit_check("pc,d2025d7957084ff1bc76c01e1abebb4d,02,05", "AOK")); // brew state
+    while(!buffer_transmit_check("pc,d2025d7957084ff1bc76c01e1abebb4d,0A,10", "AOK")); // brew state - 5, 2
     while(!buffer_transmit_check("pc,7975652bf2a24f73a2da429ac3a83dfb,0A,10", "AOK")); // brew temperature
     while(!buffer_transmit_check("pc,1cf1a1b203bb4f7ca28a8881169bede5,0A,10", "AOK")); // brew size
     while(!buffer_transmit_check("pc,538c13e23739428086ac91ab935a6ce1,02,05", "AOK")); // water level
-    while(!buffer_transmit_check("pc,67b0653508394365bf7f8afc631e54a1,02,05", "AOK")); // bean level
+    while(!buffer_transmit_check("pc,67b0653508394365bf7f8afc631e54a1,0A,10", "AOK")); // bean level - 5, 2
     while(!buffer_transmit_check("pc,dbfde0ac2cf241269759042cd13e5681,0A,10", "AOK")); // brew strength
     while(!buffer_transmit_check("pc,6ced5f74565c4608ba3d043f4b0297f9,00,20", "AOK")); // brew schedule
     
     // reboot
     while(!buffer_transmit_check("r,1", "Reboot"));
-    DELAY_MS(3000);
+    
+    // wait for command mode
+    DELAY_MS(1500);
     uart_initialization();
-    buffer_empty(&tx_buffer);
     buffer_empty(&rx_buffer);
-    DELAY_MS(500);
     receive_flag = 0;
-
+    
     // initialize micro variables
     string_copy("11223344556677889900AABBCCDDEEFF", server.uuid);
     
@@ -105,24 +105,22 @@ void bt_shw(characteristic * c, int d) {
     // assign value to characteristic
     c->value = d;
     
-    // shw handle, data
+    // shw,handle,data
     int_to_hexstring(c->value, temp);
-    string_copy("shw,", shw);
-    string_copy(c->handle,   &shw[string_len(shw)]);
-    string_copy(",", &shw[string_len(shw)]);
-    string_copy(temp,   &shw[string_len(shw)]);
+    sprintf(shw, "shw,%s,%s", c->handle, temp);
     while (!buffer_transmit_check(shw, "AOK"));
 }
 
-// NOTE: bt_shr(&bt_brew_temp) will probably be obsolete as values are read through bt_wv()
-//       and store into characteristic's value field.
+/* NOTE:
+ *   bt_shr(&bt_brew_temp) will probably be obsolete as values are read through bt_wv()
+ *   and store into characteristic's value field.
+ */
 void bt_shr(characteristic * c) {
     char shr[10];
     char temp[25];
     
-    // shr handle
-    string_copy("shr,", shr);
-    string_copy(c->handle, &shr[string_len(shr) + 1]);
+    // shr,handle
+    sprintf(shr, "shr,%s", c->handle);
     buffer_transmit(shr);
     buffer_read_segment(&rx_buffer, temp);
     

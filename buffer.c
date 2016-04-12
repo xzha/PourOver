@@ -49,8 +49,14 @@ void int_to_hexstring(int input, char * output)
     
     if(input <= 0) {
         output[index++] = '0';
+        output[index++] = '0';
         output[index] = '\0';
         return;
+    }
+    
+    if (size % 2) {
+        output[index] = '0';
+        size++;
     }
     
     while(input) {
@@ -63,7 +69,7 @@ void int_to_hexstring(int input, char * output)
         input = input / 16;
     }
     
-    output[index] = '\0';
+    output[index + ((size - 1) % 2)] = '\0';
 }
 
 int hexstring_to_int(char * s) {
@@ -85,51 +91,27 @@ int hexstring_to_int(char * s) {
 }
 
 /* Functions */
-void buffer_init(volatile buffer * buff) {
-    buff->head = 0;
-    buff->tail = 0;
-    
-    int i;
-    for (i = 0; i < BUFFER_SIZE; i ++)
-        buff->b[i] = '\0';
-}
-
 void buffer_empty(volatile buffer * buff) {
     buff->head = buff->tail;
 }
 
-void buffer_add_char(volatile buffer * buff, char c) {
-    buff->b[buff->tail] = c;
-    buff->tail = (buff->tail + 1) % BUFFER_SIZE;
-}
-
-void buffer_add(char * s) {
+void buffer_transmit(char * s) {
     int i = 0;
-    while (s[i] != '\0') {
-        buffer_add_char(&tx_buffer, s[i]);
+    
+    while(s[i] != '\0') {
+        while (U1STAbits.UTXBF);        // Wait for transmit buffer
+        while (!U1STAbits.TRMT);        // Wait for transmitter 
+        U1TXREG = s[i];
         i++;
     }
-}
-
-char buffer_write_segment(volatile buffer * buff) {
-    for (; buff->head != buff->tail; buff->head = (buff->head + 1) % BUFFER_SIZE) {
-        while (U1STAbits.UTXBF);        // Wait for transmit buffer
-        while (!U1STAbits.TRMT);        // Wait for transmitter  
-        U1TXREG = buff->b[buff->head];  // Place letter into transmit register
-        if (buff->b[buff->head] == '\n' && 
-                buff->b[(buff->head - 1) % BUFFER_SIZE] == '\r') {
-            buff->head = (buff->head + 1) % BUFFER_SIZE;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-void buffer_transmit(char * s) {
-    buffer_add(s);
-    buffer_add_char(&tx_buffer, '\r');
-    buffer_add_char(&tx_buffer, '\n');
-    while(buffer_write_segment(&tx_buffer));
+    
+    while (U1STAbits.UTXBF);        // Wait for transmit buffer
+    while (!U1STAbits.TRMT);        // Wait for transmitter 
+    U1TXREG = '\r';
+    
+    while (U1STAbits.UTXBF);        // Wait for transmit buffer
+    while (!U1STAbits.TRMT);        // Wait for transmitter 
+    U1TXREG = '\n';    
 }
 
 char buffer_read_segment(volatile buffer * buff, char * s) {

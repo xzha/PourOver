@@ -45,7 +45,6 @@ typedef struct {
 } buffer;
 
 /* Variables*/
-extern volatile buffer tx_buffer;
 extern volatile buffer rx_buffer;
 extern volatile char receive_flag;
 

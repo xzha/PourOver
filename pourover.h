@@ -102,8 +102,7 @@ volatile int brew_strength = 15;    // integer for setting the strength of the b
 volatile float brew_size = 29.5;    // float for setting the ground weight for brew size
 
 // buffers
-volatile buffer tx_buffer;
-volatile buffer rx_buffer;
+volatile buffer rx_buffer = {0, 0, {'\0'}};
 volatile char receive_flag = 0;
 
 // service

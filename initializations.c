@@ -83,6 +83,10 @@ void port_initialization(void) {
     // RD6 (sdat) & RD7 (sck) for load cell sensors, see loadsensor.h
     // RD13 for temperature sensor, see temperature.h
     
+    // RD 15 for bluetooth
+    TRISDbits.TRISD15 = 0;              // RD15 as output (BT module command pin)
+    PORTDbits.RD15 = 1;                 // Enable command mode
+    
     /* Port F */
     // RF4 & RF5 for bluetooth
     TRISFbits.TRISF4 = 0;               // RF4 as output (BT module wake pin)
@@ -95,16 +99,26 @@ void uart_initialization(void) {
     /* UART1 */
     U1MODE = 0;                         // Clear UART1 mode register
     U1STA = 0;                          // Stop UART1 and clear status register
+    
+    U1MODEbits.STSEL = 0;               // 1-Stop bit
+    U1MODEbits.PDSEL = 0;               // No Parity, 8-Data bits
+    U1MODEbits.ABAUD = 0;               // Auto-Baud disabled
+    U1MODEbits.BRGH = 0;                // Standard-Speed mode
+    
     U1BRG = BAUD_9600;                  // Baud rate
     
-    U1MODE = 0x8000;                    // Enable UART, no flow control, BRGH = 1 for high speed baud mode
-
-    U1STAbits.UTXEN = 1;                // Enable Transmit
-
-    U2STAbits.URXISEL = 0;              // Interrupt when receive buffer is 1/4 full
+    U1STAbits.UTXISEL0 = 0;             // Interrupt when receive buffer is 1/4 full
+    U1STAbits.UTXISEL0 = 0;
+    U1STAbits.URXISEL = 0;              // Interrupt when receive buffer is 1/4 full
+    
     IFS0bits.U1TXIF = 0;                // Clear TX Interrupt flag
-    IFS0bits.U1RXIF = 0;                // Clear TX Interrupt flag
+    IFS0bits.U1RXIF = 0;                // Clear RX Interrupt flag
+    
+    IEC0bits.U1TXIE = 0;                // Disable Transmit Interrupt
     IEC0bits.U1RXIE = 1;                // Enable Receive Interrupt
+    
+    U1MODEbits.UARTEN = 1;              // Enable UART
+    U1STAbits.UTXEN = 1;                // Enable Transmit
     
     DELAY_MS(1);
 }
