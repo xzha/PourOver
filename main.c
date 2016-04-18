@@ -48,17 +48,17 @@ int main()
             }
         }
         
-        // process received data (state machine?)
+        // process received data
         switch (bt_var_handle) {
-            case 0: //start_brew
+            case 0: //start_brew 75dc2f8004f242f48ab048d642153c91
                 brew_flag = 1;
                 break;
-            case 1: //brew_state
+            case 1: //brew_state d2025d7957084ff1bc76c01e1abebb4d
                 break;
             case 2: //brew_temp 7975652bf2a24f73a2da429ac3a83dfb
                 brew_temp_init = bt_brew_temp.value;
                 break;
-            case 3: //brew_size
+            case 3: //brew_size 1cf1a1b203bb4f7ca28a8881169bede5
                 if(bt_brew_size.value == 0)
                 {
                     brew_size_init = SMALL;
@@ -72,9 +72,9 @@ int main()
                     brew_size_init = LARGE;
                 }
                 break;
-            case 4: //water_level
+            case 4: //water_level 538c13e23739428086ac91ab935a6ce1
                 break;
-            case 5: //bean_level
+            case 5: //bean_level 67b0653508394365bf7f8afc631e54a1
                 break;
             case 6: //brew_strength dbfde0ac2cf241269759042cd13e5681
                 if(bt_brew_strength.value == 0)
@@ -90,7 +90,7 @@ int main()
                     brew_strength_init = BOLD;
                 }
                 break;
-            case 7: //brew_schedule
+            case 7: //brew_schedule 6ced5f74565c4608ba3d043f4b0297f9
                 break;
             default:
                 break;
@@ -99,25 +99,25 @@ int main()
         switch (coffee_state)
         {
             case READY:
-                heat_state = IDLE;           // state of heater
-                error_flag = NOERROR;        // error flag
-                heater_flag = 0;              // flag to turn heater on and off
-                pour_flag = 0;              // flag to tell the water motors to begin pouring
+                heat_state = IDLE;                  // state of heater
+                error_flag = NOERROR;               // error flag
+                heater_flag = 0;                    // flag to turn heater on and off
+                pour_flag = 0;                      // flag to tell the water motors to begin pouring
                 coffee_ready_flag = 0;              // flag to tell the user the coffee is done
-                dispense_flag = 0;              // flag to tell the bean motors to start dispensing
-                tare_flag = 1;              // set this to tare the coffee before use
-                current_temp = 0;                             // water temperature
+                dispense_flag = 0;                  // flag to tell the bean motors to start dispensing
+                tare_flag = 1;                      // set this to tare the coffee before use
+                current_temp = 0;                   // water temperature
                 brew_temp = brew_temp_init;
                 coffee_weight = 0;                  // coffee weight
-                final_weight = 0;    // final weight for water calculated on the fly
-                brew_strength = brew_strength_init;    // integer for setting the strength of the brew
-                brew_size = brew_size_init;    // float for setting the ground weight for brew size
+                final_weight = 0;                   // final weight for water calculated on the fly
+                brew_strength = brew_strength_init; // integer for setting the strength of the brew
+                brew_size = brew_size_init;         // float for setting the ground weight for brew size
                 bloom_count = 0;
                 if(brew_flag)
                 {
                     PORTBbits.RB4 = 1;
-                    coffee_state = HEAT;//ERRORCHECK;
-                    heater_flag = 1; //will need removed if bean checking is added
+                    coffee_state = HEAT;
+                    heater_flag = 1;
                     brew_flag = 0;
                 }
                 break;
@@ -288,11 +288,7 @@ int main()
         if(pour_flag)
         {
             oc_dutycycle(40, 1); // pump
-            // nico arm code circle
-            move_servo(27, 150, 10);
-            move_servo(42, 160, 10);
-            move_servo(57, 150, 10);
-            move_servo(7, 80, 10);
+            move_servo_circular(10);
         }
         if(!pour_flag)
         {

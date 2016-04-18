@@ -42,6 +42,6 @@ void timer_frequency(long int, char);
 void oc_dutycycle(float, char);
 void set_servo(int pos, char sn);
 void move_servo(int x, int y, int delay);
-
+void move_servo_circular(int delay);
 #endif	/* PourOver_outputcompare_h */
 
