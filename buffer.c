@@ -186,7 +186,7 @@ char buffer_transmit_check(char * s, char * r) {
     char status;
     
     buffer_transmit(s);
-    DELAY_MS(500);
+    DELAY_MS(250);
     
     // keep reading segment until match or empty
     while ((status = buffer_read_check(r)) == -2);

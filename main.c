@@ -28,20 +28,14 @@ int main()
         bt_var_handle = -1;
         temperature = ts_read();
         weight = ls_average_weight();
-        
-        // Send the values to the app
-        bt_shw(&bt_brew_state, coffee_state);
                 
         // BLE connected
         if (PORTFbits.RF5) {
             if (receive_flag > 0) {
-                if (buffer_check(&rx_buffer,"Connected") == 1) {
+                if (buffer_check(&rx_buffer,"Connected") == 1)
                     continue;
-                }
-                else if (buffer_check(&rx_buffer, "Connection End") == 1) {
-                    // end connection
+                else if (buffer_check(&rx_buffer, "Connection End") == 1)
                     continue;
-                }
                 
                 // BLE received data
                 bt_var_handle = bt_wv();
@@ -95,6 +89,9 @@ int main()
             default:
                 break;
         }
+        
+        // Send the current state to iOS app
+        bt_shw(&bt_brew_state, coffee_state);
         
         switch (coffee_state)
         {
