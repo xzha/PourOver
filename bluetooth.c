@@ -8,7 +8,6 @@ void bt_initialization() {
     
     /* Initialize BLE module */
     buffer_transmit_set("sn", "PourOver");
-    buffer_transmit_set("sb", "4");
     buffer_transmit_set("sr", "20006400"); // Auto advertise, iOS mode, server only, no status string
     buffer_transmit_set("ss", "00000001");
     while(!buffer_transmit_check("pz", "AOK"));
@@ -18,7 +17,7 @@ void bt_initialization() {
     
     // characteristics
     while(!buffer_transmit_check("pc,75dc2f8004f242f48ab048d642153c91,0A,01", "AOK")); // start brew
-    while(!buffer_transmit_check("pc,d2025d7957084ff1bc76c01e1abebb4d,0A,10", "AOK")); // brew state - 5, 2
+    while(!buffer_transmit_check("pc,d2025d7957084ff1bc76c01e1abebb4d,0A,01", "AOK")); // brew state - 5, 2
     while(!buffer_transmit_check("pc,7975652bf2a24f73a2da429ac3a83dfb,0A,10", "AOK")); // brew temperature
     while(!buffer_transmit_check("pc,1cf1a1b203bb4f7ca28a8881169bede5,0A,10", "AOK")); // brew size
     while(!buffer_transmit_check("pc,538c13e23739428086ac91ab935a6ce1,02,05", "AOK")); // water level
@@ -34,6 +33,7 @@ void bt_initialization() {
     uart_initialization();
     buffer_empty(&rx_buffer);
     receive_flag = 0;
+    DELAY_MS(500);
     
     // initialize micro variables
     string_copy("11223344556677889900AABBCCDDEEFF", server.uuid);

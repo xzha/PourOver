@@ -17,38 +17,30 @@ int main()
     atd_initialization();
     bt_initialization();
     ls_initialization();
-    // capacitive_sense_initialization();
+    pwm_initialization();
     
-    // pwm intialization
-    timer_frequency(500, 2); // pump    @ timer2
-    timer_frequency(50, 3);  // servo1  @ timer3
-                             // servo2  @ timer3 
-                             // ssrelay @ timer3
-    // pwm intialization
-  
+    // patch for iOS application
+    bt_shw(&bt_brew_strength, 1);
+
     while(1)
-    { 
-        int bt_var_handle = -1;
-        int loadCellValue = (int) ls_average_weight();
-        DELAY_MS(5);
-        int temperatureValue = ts_read();
-        DELAY_MS(5);
+    {   
+        bt_var_handle = -1;
+        temperature = ts_read();
+        weight = ls_average_weight();
         
-        if(brew_flag)
-        {
-            brew_flag = 0;
-            ls_tare(50);
-            DELAY_MS(100);
-            PORTBbits.RB4 = 0;
-        }
-        
+        // Send the values to the app
+        bt_shw(&bt_brew_state, coffee_state);
+                
         // BLE connected
         if (PORTFbits.RF5) {
             if (receive_flag > 0) {
-                if (buffer_check(&rx_buffer,"Connected") == 1)
+                if (buffer_check(&rx_buffer,"Connected") == 1) {
                     continue;
-                else if (buffer_check(&rx_buffer, "Connection End") == 1)
+                }
+                else if (buffer_check(&rx_buffer, "Connection End") == 1) {
+                    // end connection
                     continue;
+                }
                 
                 // BLE received data
                 bt_var_handle = bt_wv();
@@ -57,202 +49,257 @@ int main()
         
         // process received data (state machine?)
         switch (bt_var_handle) {
-            case 0: //start_brew 75dc2f8004f242f48ab048d642153c91
-                oc_dutycycle(0, 1); // pump
-                oc_dutycycle(0, 2); // servo1
-                oc_dutycycle(0, 3); // servo2
+            case 0: //start_brew
+                brew_flag = 1;
                 break;
-            case 1: //brew_state d2025d7957084ff1bc76c01e1abebb4d
-                oc_dutycycle(50, 1); // pump
-                oc_dutycycle(10, 2); // servo1
-                oc_dutycycle(10, 3); // servo2
+            case 1: //brew_state
                 break;
             case 2: //brew_temp 7975652bf2a24f73a2da429ac3a83dfb
-                bt_shw(server.c[bt_var_handle], temperatureValue);
-                // another way without access to handle would be: bt_shw(&bt_brew_temp, ts_read());
-                break; 
-            case 3:
+                brew_temp_init = bt_brew_temp.value;
                 break;
-            case 4:
+            case 3: //brew_size
+                if(bt_brew_size.value == 0)
+                {
+                    brew_size_init = SMALL;
+                }
+                else if(bt_brew_size.value == 1)
+                {
+                    brew_size_init = MEDIUM;
+                }
+                else
+                {
+                    brew_size_init = LARGE;
+                }
                 break;
-            case 5: // bean level 67b0653508394365bf7f8afc631e54a1
-                oc_dutycycle(25, 1); // pump
-                oc_dutycycle(5, 2);  // servo1
-                oc_dutycycle(5, 3);  // servo2
+            case 4: //water_level
+                break;
+            case 5: //bean_level
                 break;
             case 6: //brew_strength dbfde0ac2cf241269759042cd13e5681
-                bt_shw(server.c[bt_var_handle], loadCellValue);
+                if(bt_brew_strength.value == 0)
+                {
+                    brew_strength_init = WEAK;
+                }
+                else if(bt_brew_strength.value == 1)
+                {
+                    brew_strength_init = REGULAR;
+                }
+                else
+                {
+                    brew_strength_init = BOLD;
+                }
                 break;
-            case 7:
+            case 7: //brew_schedule
                 break;
             default:
                 break;
         }
-    }
-    
-//    while(1)
-//    {
-//        char bt_var_handle = -1;
-//        int i = 0;
-//
-//        // BLE connected
-//        if (PORTFbits.RF5) {
-//            if (receive_flag > 0) {
-//                if (buffer_check(&rx_buffer,"Connected") == 1)
-//                    continue;
-//                else if (buffer_check(&rx_buffer, "Connection End") == 1)
-//                    continue;
-//                
-//                // BLE received data
-//                bt_var_handle = bt_wv();
-//            }
-//        }
-//        
-//        // process received data (state machine?)
-//        switch (bt_var_handle) {
-//            case 0: //start_brew
-//                oc_dutycycle(0, 1); // pump
-//                oc_dutycycle(0, 2); // servo1
-//                oc_dutycycle(0, 3); // servo2
-//                break;
-//            case 1:
-//                break;
-//            case 2: //brew_temp 7975652bf2a24f73a2da429ac3a83dfb
-//                oc_dutycycle(50, 1); // pump
-//                oc_dutycycle(10, 2); // servo1
-//                oc_dutycycle(10, 3); // servo2
-//                break;
-//            case 3:
-//                break;
-//            case 4:
-//                break;
-//            case 5:
-//                break;
-//            case 6: //brew_strength dbfde0ac2cf241269759042cd13e5681
-//                oc_dutycycle(25, 1); // pump
-//                oc_dutycycle(5, 2);  // servo1
-//                oc_dutycycle(5, 3);  // servo2
-//                break;
-//            case 7:
-//                break;
-//            default:
-//                break;
-//        }
-//        
-//        switch (coffee_state)
-//        {
-//            case READY:
-//                coffee_ready_flag = 0;
-//                if(brew_flag)
-//                {
-//                    coffee_state = ERRORCHECK;
-//                    brew_flag = 0;
-//                }
-//                break;
-//            case ERRORCHECK:
-//                // measure the water and bean level to see if brewing is possible
-//                error_flag = 0;                
-//                for(i = 0; i < 5; i++)
-//                {
-//                    water_level = capacitive_sense_raw(100);
-//                    if(water_level < 200) error_flag = WATERERROR;
-//                }
-//
-//                bean_level = get_light_value();
-//                if(bean_level < 150) error_flag = BEANERROR;
-//                
-//                // if no bean or water flag, continue to next state
-//                // else, transmit error
-//                if(!error_flag)
-//                {
-//                    coffee_state = HEAT;
-//                }
-//                        
-//                break;
-//            case HEAT:
-//                if(temp >= 200)
-//                {
-//                    heat_state = HEATEROFF;
-//                    coffee_state = DISPENSE;
-//                }
-//                else
-//                {
-//                    heat_state = HEATERON;
-//                }
-//                
-//                break;
-//            case DISPENSE:
-//                if(tare_flag)
-//                {
-//                    ls_tare(50);
-//                    tare_flag = 0;
-//                    dispense_flag = 1;
-//                }
-//                
-//                if(coffee_weight < brew_size)
-//                {
-//                    coffee_weight = ls_average_weight();
-//                }
-//                else
-//                {
-//                    dispense_flag = 0;
-//                    coffee_state = POUR;
-//                    tare_flag = 1;
-//                }
-//                break;
-//            case POUR:
-//                if(tare_flag)
-//                {
-//                    ls_tare(50);
-//                    tare_flag = 0;
-//                    pour_flag = 0;
-//                }
-//                
-//                pour_flag = 1;
-//                
-//                if(coffee_weight < brew_size * brew_strength)
-//                {
-//                    coffee_weight = ls_average_weight();
-//                }
-//                else
-//                {
-//                    pour_flag = 0;
-//                    coffee_state = DONE;
-//                    // may need to add code for a transition to the pause state.
-//                    // also may not need to because of the pour rate.
-//                    // needs to be tested in the system.
-//                }
-//                break;
-//            case DONE:
-//                PORTBbits.RB4 = 0;
-//                coffee_ready_flag = 1;
-//                break;
-//            default:
-//                break;
-//        }
-//        
-//        //i think this should be in an interrupt????********
-//        switch(heat_state)
-//        {
-//            case IDLE:
-//                heater_flag = 0;
-//                break;
-//            case HEATERON:
-//                heater_flag = 1;
-//                break;
-//            case HEATEROFF:
-//                heater_flag = 0;
-//                if(temp < 200)
-//                {
-//                    heat_state = HEATERON;
-//                }
-//                break;
-//            default:
-//                break;
-//        }
-//    }
+        
+        switch (coffee_state)
+        {
+            case READY:
+                heat_state = IDLE;           // state of heater
+                error_flag = NOERROR;        // error flag
+                heater_flag = 0;              // flag to turn heater on and off
+                pour_flag = 0;              // flag to tell the water motors to begin pouring
+                coffee_ready_flag = 0;              // flag to tell the user the coffee is done
+                dispense_flag = 0;              // flag to tell the bean motors to start dispensing
+                tare_flag = 1;              // set this to tare the coffee before use
+                current_temp = 0;                             // water temperature
+                brew_temp = brew_temp_init;
+                coffee_weight = 0;                  // coffee weight
+                final_weight = 0;    // final weight for water calculated on the fly
+                brew_strength = brew_strength_init;    // integer for setting the strength of the brew
+                brew_size = brew_size_init;    // float for setting the ground weight for brew size
+                bloom_count = 0;
+                if(brew_flag)
+                {
+                    PORTBbits.RB4 = 1;
+                    coffee_state = HEAT;//ERRORCHECK;
+                    heater_flag = 1; //will need removed if bean checking is added
+                    brew_flag = 0;
+                }
+                break;
+            case HEAT:
+                if(!heater_flag)
+                {
+                    coffee_state = DISPENSE;
+                }
 
-    return(0);
+                PORTBbits.RB4 = 1;
+                DELAY_MS(200);
+                PORTBbits.RB4 = 0;
+                DELAY_MS(100);
+                PORTBbits.RB4 = 1;
+                break;
+            case DISPENSE:
+                if(tare_flag)
+                {
+                    ls_tare(50);
+                    tare_flag = 0;
+                    dispense_flag = 1;
+                    DELAY_MS(100);
+                    coffee_weight = weight;
+                }
+                
+                if(coffee_weight < brew_size- 20)
+                {
+                    coffee_weight = weight;
+                    PORTBbits.RB4 = 0;
+                    DELAY_MS(50);
+                    PORTBbits.RB4 = 1;
+                    DELAY_MS(50);
+                    PORTBbits.RB4 = 0;
+                    DELAY_MS(50);
+                    PORTBbits.RB4 = 1;
+                    DELAY_MS(50);
+                }
+                else
+                {
+                    PORTBbits.RB4 = 1;
+                    DELAY_MS(2000);
+                    dispense_flag = 0;
+                    coffee_state = BLOOM;
+                    tare_flag = 1;
+                }
+                break;
+            case BLOOM:
+                if(tare_flag)
+                {
+                    ls_tare(50);
+                    tare_flag = 0;
+                    DELAY_MS(100);
+                    coffee_weight = weight;
+                }
+                
+                bloom_count++;
+                if(bloom_count == 1) oc_dutycycle(100, 1); // pump
+                
+                
+                if(coffee_weight < (brew_size * 2)- 20)
+                {
+                    pour_flag = 1;
+                    coffee_weight = weight;
+                }
+                else
+                {
+                    pour_flag = 0;
+                    oc_dutycycle(0, 1);
+                }
+                
+                if(bloom_count >= 30)
+                {
+                    coffee_state = POUR;
+                    tare_flag = 1;
+                }
+                else
+                {
+                    DELAY_MS(900);
+                }
+                break;
+            case POUR:
+                if(tare_flag)
+                {
+                    ls_tare(50);
+                    tare_flag = 0;
+                    DELAY_MS(100);
+                    coffee_weight = weight;
+                    oc_dutycycle(40, 1); // pump
+                }
+
+                pour_flag = 1;
+                
+                if(coffee_weight < (brew_size * brew_strength) - 20)
+                {
+                    coffee_weight = weight;
+                }
+                else
+                {
+                    oc_dutycycle(0, 1);
+                    pour_flag = 0;
+                    coffee_state = DONE;
+                    // may need to add code for a transition to the pause state.
+                    // also may not need to because of the pour rate.
+                    // needs to be tested in the system.
+                }
+                break;
+            case DONE:
+                PORTBbits.RB4 = 0;
+                coffee_ready_flag = 1;
+                
+                //Show the user the brewing process is done by flashing the LED
+                for(i = 0; i < 4; i++)
+                {
+                    PORTBbits.RB4 = 1;
+                    DELAY_MS(500);
+                    PORTBbits.RB4 = 0;
+                    DELAY_MS(500);
+                }
+                break;
+            default:
+                break;
+        }
+        
+        //reset everything for the state machine and return all states to idle
+        if(coffee_ready_flag)
+        {
+            coffee_state = READY;          // state of coffee machine
+            brew_flag = 0;              // flag to tell if the user wants coffee
+        }
+        
+        //i think this should be in an interrupt????********
+        switch(heat_state)
+        {
+            case IDLE:
+                if(heater_flag) heat_state = HEATERON;
+                break;
+            case HEATERON:
+                current_temp = temperature;
+                heater_flag = 1;
+                if(current_temp >= (brew_temp-20))
+                {
+                    heat_state = HEATEROFF;
+                    heater_flag = 0;
+                }
+                break;
+            case HEATEROFF:
+                heater_flag = 0;
+                current_temp = temperature;
+                if(current_temp < (brew_temp-20))
+                {
+                    heat_state = HEATERON;
+                    heater_flag = 1;
+                }
+                break;
+            default:
+                break;
+        }
+        
+        if(heater_flag)
+        {
+            oc_dutycycle(100, 4);   //heater on
+        }
+        else
+        {
+            oc_dutycycle(0, 4);     //heater off
+        }
+        
+        if(pour_flag)
+        {
+            oc_dutycycle(40, 1); // pump
+            // nico arm code circle
+            move_servo(27, 150, 10);
+            move_servo(42, 160, 10);
+            move_servo(57, 150, 10);
+            move_servo(7, 80, 10);
+        }
+        if(!pour_flag)
+        {
+            oc_dutycycle(0, 1); // pump
+        }
+    }
+
+    return 0;
 }
 
 /* Interrupts */ 

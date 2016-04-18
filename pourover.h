@@ -38,7 +38,6 @@
 #include "bluetooth.h"
 #include "temperature.h"
 #include "loadsensor.h"
-// #include "capacitivesensing.h"
 #include "lightsensor.h"
 
 /* Enumerations */
@@ -47,6 +46,7 @@ typedef enum {
     ERRORCHECK,
     HEAT,
     DISPENSE,
+    BLOOM,
     POUR,
     DONE
 } brew_state;
@@ -68,38 +68,43 @@ typedef enum {
 /* Constants */
 #define WEAK 20              // weak brew strength
 #define REGULAR 15           // regular brew strength
-#define BOLD 10              // bold brew strength
+#define BOLD 8              // bold brew strength
 
-#define SMALL 23.6           // bean grams for small brew size
-#define MEDIUM 29.5          // bean grams for medium brew size
+#define SMALL 20.6           // bean grams for small brew size
+#define MEDIUM 27.5          // bean grams for medium brew size
 #define LARGE 35.4           // bean grams for large brew size
 
 /* Variables */
 // states
-volatile brew_state coffee_state = READY;          // state of coffee machine
-volatile heater_state heat_state = IDLE;           // state of heater
-volatile int pb_state            = 0;              // last state of the PB
+brew_state coffee_state = READY;          // state of coffee machine
+heater_state heat_state = IDLE;           // state of heater
+int pb_state            = 0;              // last state of the PB
 
 // flags
-volatile error error_flag        = NOERROR;        // error flag
-volatile int heater_flag         = 0;              // flag to turn heater on and off
-volatile int pour_flag           = 0;              // flag to tell the water motors to begin pouring
-volatile int coffee_ready_flag   = 0;              // flag to tell the user the coffee is done
-volatile int brew_flag           = 0;              // flag to tell if the user wants coffee
-volatile int dispense_flag       = 0;              // flag to tell the bean motors to start dispensing
-volatile int tare_flag           = 1;              // set this to tare the coffee before use
+error error_flag        = NOERROR;        // error flag
+int heater_flag         = 0;              // flag to turn heater on and off
+int pour_flag           = 0;              // flag to tell the water motors to begin pouring
+int coffee_ready_flag   = 0;              // flag to tell the user the coffee is done
+int brew_flag           = 0;              // flag to tell if the user wants coffee
+int dispense_flag       = 0;              // flag to tell the bean motors to start dispensing
+int tare_flag           = 1;              // set this to tare the coffee before use
+int bloom_count         = 1;
+int brew_size_init      = MEDIUM;
+int brew_strength_init  = REGULAR;
+int brew_temp_init = 200;
 
 // measurements
-volatile long water_level;                         // water level measurement
-volatile int bean_level;                           // bean level measurement
-volatile int temp = 0;                             // water temperature
-volatile float coffee_weight = 0;                  // coffee weight
-volatile int pb_reading;                           // value read from PB
+long water_level;                         // water level measurement
+int bean_level;                           // bean level measurement
+int current_temp = 0;                     // current water temperature
+int brew_temp = 0;                        // temp to brew at
+float coffee_weight = 0;                  // coffee weight
+int pb_reading;                           // value read from PB
 
 // coffee specifications
-volatile float final_weight = 0;    // final weight for water calculated on the fly
-volatile int brew_strength = 15;    // integer for setting the strength of the brew
-volatile float brew_size = 29.5;    // float for setting the ground weight for brew size
+float final_weight = 0;      // final weight for water calculated on the fly
+int brew_strength = BOLD;    // integer for setting the strength of the brew
+float brew_size = MEDIUM;    // float for setting the ground weight for brew size
 
 // buffers
 volatile buffer rx_buffer = {0, 0, {'\0'}};
@@ -117,5 +122,11 @@ characteristic bt_water_level;
 characteristic bt_bean_level;
 characteristic bt_brew_strength;
 characteristic bt_brew_schedule;
+
+// main loop variables
+int i = 0;                  // loop counter
+char bt_var_handle;         // determines BT handle that is written to
+int temperature;            // real time temperature value
+float weight;               // real time weight value
 
 #endif	/* PourOver_h */

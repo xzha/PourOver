@@ -35,9 +35,13 @@
 
 /* Functions */
 int power(int, int);
+int abs(int x);
 
+void pwm_initialization();
 void timer_frequency(long int, char);
 void oc_dutycycle(float, char);
+void set_servo(int pos, char sn);
+void move_servo(int x, int y, int delay);
 
 #endif	/* PourOver_outputcompare_h */
 

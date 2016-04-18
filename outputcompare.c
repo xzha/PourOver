@@ -9,6 +9,9 @@ float oc2_dutycycle = 0.0;              // servo1
 float oc3_dutycycle = 0.0;              // servo2
 float oc4_dutycycle = 0.0;              // ss relay
 
+int servo1_pos = 0;
+int servo2_pos = 0;
+
 int power(int base, int exp) {
     int i;
     int result = 1;
@@ -17,6 +20,23 @@ int power(int base, int exp) {
         result *= base;
     
     return result;
+}
+
+int abs(int x) {
+    if (x < 0)
+        return x * -1;
+    return x;
+}
+
+void pwm_initialization() {
+    timer_frequency(500, 2); // pump    @ timer2
+    timer_frequency(50, 3);  // servo1  @ timer3, shoulder
+                             // servo2  @ timer3, arm
+                             // ssrelay @ timer3
+    
+    // arm and shoulder initialization
+    set_servo(7, 1);
+    set_servo(80, 2);
 }
 
 void timer_frequency(long int frequency, char tn) {
@@ -70,7 +90,7 @@ void timer_frequency(long int frequency, char tn) {
 }
 
 void oc_dutycycle(float percentage, char ocn) {
-    float ratio = percentage / 100;
+    float ratio = percentage / 100.0;
     
     switch(ocn) {
         case 1: OC1RS = (int) (ratio * timer2_period);
@@ -85,5 +105,80 @@ void oc_dutycycle(float percentage, char ocn) {
         case 4: OC4RS = (int) (ratio * timer3_period);
                 oc4_dutycycle = percentage;
                 break;
+    }
+}
+
+void set_servo(int pos, char sn) {
+    float percentage; 
+    
+    percentage = (pos / 180.0) * 10;
+    percentage += 3;
+    
+    // 2 == shoulder, 3 == arm
+    if (sn == 1) {
+        servo1_pos = pos;
+        oc_dutycycle(percentage, 2);
+        
+    }
+    else if (sn == 2) {
+        servo2_pos = pos;
+        oc_dutycycle(percentage, 3);
+    }
+}
+
+void move_servo(int x, int y, int delay) {
+    int i;
+    int j;    
+    int mod;
+    int ratio;
+    int delta_x;
+    int delta_y;
+    
+    delta_x = x - servo1_pos;
+    delta_y = y - servo2_pos;
+    
+    if (delta_x == 0 || delta_y == 0) {
+        return;
+    }
+    
+    if (abs(delta_x) > abs(delta_y)) {
+        ratio = abs(delta_x) / abs(delta_y);
+        mod = abs(delta_x) % abs(delta_y);
+        
+        for (i = 0; i < abs(delta_y); i++) {
+            set_servo(servo2_pos + (delta_y/abs(delta_y)), 2);
+            DELAY_MS(delay);
+            
+            for (j = 0; j < ratio; j++) {
+                set_servo(servo1_pos + (delta_x/abs(delta_x)), 1);
+                DELAY_MS(delay);
+            }
+            
+            if (mod) {
+                set_servo(servo1_pos + (delta_x/abs(delta_x)), 1);
+                DELAY_MS(delay);
+                mod--;
+            }
+        }
+        
+    } else {
+        ratio = abs(delta_y) / abs(delta_x);
+        mod = abs(delta_y) % abs(delta_x);
+        
+        for (i = 0; i < abs(delta_x); i++) {
+            set_servo(servo1_pos + (delta_x/abs(delta_x)), 1);
+            DELAY_MS(delay);
+            
+            for (j = 0; j < ratio; j++) {
+                set_servo(servo2_pos + (delta_y/abs(delta_y)), 2);
+                DELAY_MS(delay);
+            }
+            
+            if (mod) {
+                set_servo(servo2_pos + (delta_y/abs(delta_y)), 2);
+                DELAY_MS(delay);
+                mod--;
+            }
+        }
     }
 }
