@@ -24,6 +24,7 @@ int main()
 
     while(1)
     {   
+        // reset values
         bt_var_handle = -1;
         temperature = ts_read();
         weight = ls_average_weight();
