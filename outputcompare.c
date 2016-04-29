@@ -184,8 +184,8 @@ void move_servo(int x, int y, int delay) {
 }
 
 void move_servo_circular(int delay) {
-    move_servo(27, 150, delay);
-    move_servo(42, 160, delay);
-    move_servo(57, 150, delay);
+    move_servo(38, 150, delay);
+    move_servo(44, 160, delay);
+    move_servo(51, 150, delay);
     move_servo(7, 80, delay);
 }

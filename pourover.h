@@ -66,13 +66,17 @@ typedef enum {
 } error;
 
 /* Constants */
-#define WEAK 20              // weak brew strength
-#define REGULAR 15           // regular brew strength
-#define BOLD 8              // bold brew strength
+#define WEAK 15              // weak brew strength
+#define REGULAR 10           // regular brew strength
+#define BOLD 8               // bold brew strength
 
-#define SMALL 20.6           // bean grams for small brew size
-#define MEDIUM 27.5          // bean grams for medium brew size
-#define LARGE 35.4           // bean grams for large brew size
+#define SMALL 18.3           // bean grams for small brew size
+#define MEDIUM 20.5          // bean grams for medium brew size
+#define LARGE 28.7           // bean grams for large brew size
+
+//#define SMALL 15.6           // bean grams for small brew size
+//#define MEDIUM 19.5          // bean grams for medium brew size
+//#define LARGE 22.4           // bean grams for large brew size
 
 /* Variables */
 // states
@@ -89,9 +93,11 @@ int brew_flag           = 0;              // flag to tell if the user wants coff
 int dispense_flag       = 0;              // flag to tell the bean motors to start dispensing
 int tare_flag           = 1;              // set this to tare the coffee before use
 int bloom_count         = 1;
+int temp_flag           = 0;
 int brew_size_init      = MEDIUM;
 int brew_strength_init  = REGULAR;
-int brew_temp_init = 200;
+int brew_temp_init      = 190;
+int reset_count         = 0;
 
 // measurements
 long water_level;                         // water level measurement

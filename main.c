@@ -1,5 +1,8 @@
 #include "pourover.h"
 
+#define PUMP_DC 50
+#define MAX_HELD 5000
+
 int main()
 {    
     DELAY_MS(1500);                     // Wait for peripherals to be powered up
@@ -21,7 +24,7 @@ int main()
     
     // patch for iOS application
     bt_shw(&bt_brew_strength, 1);
-
+    
     while(1)
     {   
         // reset values
@@ -51,6 +54,9 @@ int main()
                 break;
             case 2: //brew_temp 7975652bf2a24f73a2da429ac3a83dfb
                 brew_temp_init = bt_brew_temp.value;
+                
+                if (brew_temp_init >= 190 || brew_temp_init <= 100)
+                    brew_temp_init = 190;
                 break;
             case 3: //brew_size 1cf1a1b203bb4f7ca28a8881169bede5
                 if(bt_brew_size.value == 0)
@@ -96,6 +102,7 @@ int main()
         switch (coffee_state)
         {
             case READY:
+                PORTBbits.RB4 = 0;
                 heat_state = IDLE;                  // state of heater
                 error_flag = NOERROR;               // error flag
                 heater_flag = 0;                    // flag to turn heater on and off
@@ -110,22 +117,24 @@ int main()
                 brew_strength = brew_strength_init; // integer for setting the strength of the brew
                 brew_size = brew_size_init;         // float for setting the ground weight for brew size
                 bloom_count = 0;
+                temp_flag = 0;
                 if(brew_flag)
                 {
                     PORTBbits.RB4 = 1;
-                    coffee_state = HEAT;
-                    heater_flag = 1;
+                    coffee_state = DISPENSE;
                     brew_flag = 0;
                 }
                 break;
             case HEAT:
-                if(!heater_flag)
+                if(temp_flag)
                 {
-                    coffee_state = DISPENSE;
+                    coffee_state = BLOOM;
                 }
 
+                PORTBbits.RB4 = 0;
+                DELAY_MS(100);
                 PORTBbits.RB4 = 1;
-                DELAY_MS(200);
+                DELAY_MS(100);
                 PORTBbits.RB4 = 0;
                 DELAY_MS(100);
                 PORTBbits.RB4 = 1;
@@ -140,24 +149,25 @@ int main()
                     coffee_weight = weight;
                 }
                 
-                if(coffee_weight < brew_size- 20)
+                if(coffee_weight < brew_size)
                 {
                     coffee_weight = weight;
                     PORTBbits.RB4 = 0;
-                    DELAY_MS(50);
+                    DELAY_MS(100);
                     PORTBbits.RB4 = 1;
-                    DELAY_MS(50);
-                    PORTBbits.RB4 = 0;
-                    DELAY_MS(50);
-                    PORTBbits.RB4 = 1;
-                    DELAY_MS(50);
+                    DELAY_MS(100);
+//                    PORTBbits.RB4 = 0;
+//                    DELAY_MS(50);
+//                    PORTBbits.RB4 = 1;
+//                    DELAY_MS(50);
                 }
                 else
                 {
                     PORTBbits.RB4 = 1;
                     DELAY_MS(2000);
                     dispense_flag = 0;
-                    coffee_state = BLOOM;
+                    coffee_state = HEAT;
+                    heater_flag = 1;
                     tare_flag = 1;
                 }
                 break;
@@ -171,10 +181,10 @@ int main()
                 }
                 
                 bloom_count++;
-                if(bloom_count == 1) oc_dutycycle(100, 1); // pump
+                if(bloom_count == 1) oc_dutycycle(PUMP_DC, 1); // pump
                 
                 
-                if(coffee_weight < (brew_size * 2)- 20)
+                if(coffee_weight < (brew_size * 2))
                 {
                     pour_flag = 1;
                     coffee_weight = weight;
@@ -188,7 +198,7 @@ int main()
                 if(bloom_count >= 30)
                 {
                     coffee_state = POUR;
-                    tare_flag = 1;
+                    tare_flag = 0;
                 }
                 else
                 {
@@ -202,12 +212,12 @@ int main()
                     tare_flag = 0;
                     DELAY_MS(100);
                     coffee_weight = weight;
-                    oc_dutycycle(40, 1); // pump
+                    oc_dutycycle(PUMP_DC, 1); // pump
                 }
 
                 pour_flag = 1;
                 
-                if(coffee_weight < (brew_size * brew_strength) - 20)
+                if(coffee_weight < (brew_size * brew_strength))
                 {
                     coffee_weight = weight;
                 }
@@ -254,20 +264,24 @@ int main()
             case HEATERON:
                 current_temp = temperature;
                 heater_flag = 1;
-                if(current_temp >= (brew_temp-20))
+                if(current_temp >= (brew_temp-50))
                 {
                     heat_state = HEATEROFF;
                     heater_flag = 0;
                 }
+                
+                if(current_temp >= brew_temp) temp_flag = 1;
                 break;
             case HEATEROFF:
                 heater_flag = 0;
                 current_temp = temperature;
-                if(current_temp < (brew_temp-20))
+                if(current_temp < (brew_temp-30))
                 {
                     heat_state = HEATERON;
                     heater_flag = 1;
                 }
+                
+                if(current_temp >= brew_temp) temp_flag = 1;
                 break;
             default:
                 break;
@@ -284,12 +298,17 @@ int main()
         
         if(pour_flag)
         {
-            oc_dutycycle(40, 1); // pump
+            oc_dutycycle(PUMP_DC, 1); // pump
+            DELAY_MS(1050);
             move_servo_circular(10);
+            DELAY_MS(50);
+            oc_dutycycle(0,1);
+            DELAY_MS(1000);
         }
         if(!pour_flag)
         {
             oc_dutycycle(0, 1); // pump
+            move_servo(7, 80, 10); // reset servo location
         }
     }
 
@@ -313,8 +332,6 @@ void __attribute__((__interrupt__, auto_psv)) _T2Interrupt(void)
     if(pb_reading == pb_state)
     {
         PORTBbits.RB4 = 1;
-        
-        pb_state = pb_reading;
         
         brew_flag = 1;
     }

@@ -81,8 +81,8 @@ int hexstring_to_int(char * s) {
         
         if (s[i] >= 0x30 && s[i] <= 0x39)
             r += s[i] - 0x30;
-        else if (s[i] >= 0x61 && s[i] <= 0x66)
-            r += (s[i] - 0x61) + 10;
+        else if (s[i] >= 0x41 && s[i] <= 0x46)
+            r += (s[i] - 0x41) + 10;
         
         i++;
     }

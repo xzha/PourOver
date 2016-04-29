@@ -18,12 +18,12 @@ void bt_initialization() {
     // characteristics
     while(!buffer_transmit_check("pc,75dc2f8004f242f48ab048d642153c91,0A,01", "AOK")); // start brew
     while(!buffer_transmit_check("pc,d2025d7957084ff1bc76c01e1abebb4d,0A,01", "AOK")); // brew state
-    while(!buffer_transmit_check("pc,7975652bf2a24f73a2da429ac3a83dfb,0A,10", "AOK")); // brew temperature
-    while(!buffer_transmit_check("pc,1cf1a1b203bb4f7ca28a8881169bede5,0A,10", "AOK")); // brew size
-    while(!buffer_transmit_check("pc,538c13e23739428086ac91ab935a6ce1,02,05", "AOK")); // water level
-    while(!buffer_transmit_check("pc,67b0653508394365bf7f8afc631e54a1,0A,10", "AOK")); // bean level
-    while(!buffer_transmit_check("pc,dbfde0ac2cf241269759042cd13e5681,0A,10", "AOK")); // brew strength
-    while(!buffer_transmit_check("pc,6ced5f74565c4608ba3d043f4b0297f9,00,20", "AOK")); // brew schedule
+    while(!buffer_transmit_check("pc,7975652bf2a24f73a2da429ac3a83dfb,0A,01", "AOK")); // brew temperature
+    while(!buffer_transmit_check("pc,1cf1a1b203bb4f7ca28a8881169bede5,0A,01", "AOK")); // brew size
+    while(!buffer_transmit_check("pc,538c13e23739428086ac91ab935a6ce1,02,01", "AOK")); // water level
+    while(!buffer_transmit_check("pc,67b0653508394365bf7f8afc631e54a1,0A,01", "AOK")); // bean level
+    while(!buffer_transmit_check("pc,dbfde0ac2cf241269759042cd13e5681,0A,01", "AOK")); // brew strength
+    while(!buffer_transmit_check("pc,6ced5f74565c4608ba3d043f4b0297f9,00,01", "AOK")); // brew schedule
     
     // reboot
     while(!buffer_transmit_check("r,1", "Reboot"));
@@ -130,7 +130,7 @@ void bt_shr(characteristic * c) {
 }
 
 char bt_wv() {
-    char temp[50];
+    char temp[100];
     
     char d[35];
     char h[5];
@@ -153,6 +153,9 @@ char bt_wv() {
         
     // read in data
     while (temp[i] != '.') {
+        if (temp[i] == '0')
+            break;
+        
         d[i - offset] = temp[i];
         i++;
     }
